@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solutions that transform your business</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <style>
+    /* Modern Minimal CSS Reset & Base Styles */
+    :root {
+      --dark-blue: #0a0f2c;
+      --bright-blue: #00e0ff;
+      --text-light: #dceef9;
+      --card-bg: #131b3a;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --transition: all 0.3s ease;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--dark-blue);
+      color: var(--text-light);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Modern Header */
+    header {
+      text-align: center;
+      padding: clamp(3rem, 8vw, 8rem) 1rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, var(--dark-blue), #0d1642);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      gap: 0.75rem;
+    }
+
+    .logo-image {
+      width: clamp(40px, 8vw, 60px);
+      height: clamp(40px, 8vw, 60px);
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    header h1 {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      line-height: 1.1;
+      color: var(--bright-blue);
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 20px rgba(0, 224, 255, 0.2);
+      max-width: 65ch;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header p.highlight {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      margin: 0;
+      background: linear-gradient(90deg, var(--bright-blue), #80f0ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    /* Pharma Info Button */
+    .pharma-info-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: var(--bright-blue);
+      color: var(--dark-blue);
+      padding: 10px 15px;
+      border-radius: 50px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0, 224, 255, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 100;
+      cursor: pointer;
+    }
+
+    .pharma-info-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 224, 255, 0.4);
+    }
+
+    .pharma-info-btn .arrow {
+      font-size: 1.2em;
+      transition: transform 0.3s ease;
+    }
+
+    .pharma-info-btn:hover .arrow {
+      transform: translateX(3px);
+    }
+
+    /* Modern Section Layout */
+    main {
+        flex: 1;
+    }
+
+    section {
+      padding: clamp(3rem, 6vw, 5rem) 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    section h2 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      color: var(--bright-blue);
+      margin-bottom: 2rem;
+      font-weight: 700;
+    }
+
+    .card {
+      background: var(--card-bg);
+      /* border-left: 4px solid var(--bright-blue); */
+      padding: clamp(1.5rem, 3vw, 2rem);
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      transition: var(--transition);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      margin-bottom: 0.75rem;
+      color: var(--bright-blue);
+      font-size: clamp(1.25rem, 3vw, 1.5rem);
+    }
+
+    .card p {
+        margin-bottom: 1rem;
+    }
+
+    .card p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Modern Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background-color: #0c122d;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    /* Highlight Text */
+    .highlight {
+      color: var(--bright-blue);
+      font-weight: bold;
+    }
+
+    /* Responsive Grids */
+    .features-grid,
+    .why-choose-grid {
+      display: grid;
+      gap: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .features-grid {
+        /* Adjusts from 1 column on small screens to 4 on large */
+        grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    }
+
+    .why-choose-grid {
+        /* Adjusts from 1 column on small screens to 2 then 4 on large */
+         grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    }
+
+
+    /* Section Images */
+    .section-image {
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+      margin: 0 auto 2rem auto;
+      display: block;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    /* Card Images */
+    .card-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 1rem;
+    }
+
+    /* Contact Cards */
+    .contact-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .contact-cards .card {
+        text-align: center;
+    }
+
+    .contact-cards a {
+        color: var(--bright-blue);
+        transition: var(--transition);
+    }
+
+    .contact-cards a:hover {
+        color: #80f0ff;
+        text-decoration: underline;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <a href="blog.html" class="pharma-info-btn">
+      <span>Pharma Company Information</span>
+      <span class="arrow">→</span>
+    </a>
+    <h1>Solutions that transform your business</h1>
+        <div class="logo-container">
+      <img src="logo.jpg" alt="CLS TECH AI Logo" class="logo-image">
+      <p class="highlight">CLS TECH AI</p>
+    </div>
+  </header>
+
+  <main>
+      <section>
+        <h2>Who We Are</h2>
+        <div class="card">
+        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800" alt="Tech Team" class="section-image">
+        <p>We are an industrial technology and innovation company driving the future of smart manufacturing and digital transformation — from sensors to SAP, and everything in between.</p>
+        <p>Our mission is to empower industries with intelligent, connected solutions that span the entire operational spectrum — integrating machines, data, people, and enterprise systems to unlock performance, agility, and sustainability.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Our Services</h2>
+        <div class="card">
+        <p>We provide full-stack digital transformation services across key industrial sectors including Pharmaceuticals, Oil & Gas, Metals & Mining, Energy, Automotive, Aerospace, and Heavy Manufacturing.</p>
+        <p>From deploying real-time sensors, IoT devices, and custom-built special-purpose machinery on the factory floor, to integrating advanced analytics, AI, and automation with enterprise systems like SAP — we deliver seamless, scalable solutions that connect operations from bottom to top.</p>
+        <p>As part of the Global Lighthouse Network, we bring proven expertise in Industry 4.0 adoption, using the Smart Industry Readiness Index (SIRI) to guide enterprises through their digital journey with clarity and confidence.</p>
+        <p>Our cloud-native platforms unify data across departments and geographies, enabling real-time insights, predictive decision-making, and optimized supply chains — all while ensuring compliance, security, and interoperability.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>What We Deliver</h2>
+        <div class="card">
+        <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800" alt="Digital Innovation" class="section-image">
+        <p>We're not just building smarter machines — we're shaping the future of industry. From "sensors to SAP", we deliver end-to-end digital transformation across Pharma, Oil & Gas, Metals, Energy, and beyond.</p>
+        <p>With AI-powered insights, custom automation, and Industry 4.0 expertise, we help enterprises evolve into "intelligent, agile, and future-ready" organizations. Whether it's smart factories, predictive maintenance, or cloud-native platforms, we bring innovation from concept to reality.</p>
+        <p><span class="highlight">"Digital isn't optional — it's essential."</span></p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Core Offerings</h2>
+        <div class="features-grid">
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?w=400" alt="Custom Machines" class="card-image">
+            <h3>Custom Machines</h3>
+            <p>Special-purpose machines for pharmaceutical manufacturing</p>
+        </div>
+        <div class="card">
+            <img src="https://onlinedegrees.sandiego.edu/wp-content/uploads/2023/04/Applications-of-AI-in-Robots_An-Introduction.jpg?w=400" alt="AI Robotics" class="card-image">
+            <h3>AI Robotics</h3>
+            <p>AI-integrated robotics for industrial applications</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" alt="Smart Sensors" class="card-image">
+            <h3>Smart Sensors & IoT</h3>
+            <p>Real-time monitoring with sensor deployment</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400" alt="Predictive Analytics" class="card-image">
+            <h3>Predictive Analytics</h3>
+            <p>AI for forecasting and decision-making</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400" alt="R&D" class="card-image">
+            <h3>R&D Acceleration</h3>
+            <p>Boost innovation in Pharma through tech</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400" alt="Industry 4.0" class="card-image">
+            <h3>Industry 4.0 Consulting</h3>
+            <p>SIRI-based readiness assessments and implementation</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=400" alt="Digital Twins" class="card-image">
+            <h3>Digital Twins</h3>
+            <p>Simulation, training, and optimization tools</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400" alt="Maintenance" class="card-image">
+            <h3>Predictive Maintenance</h3>
+            <p>For Oil & Gas, Metals, Energy, and more</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1584949091598-c31daaaa4aa9?w=400" alt="Smart Automation" class="card-image">
+            <h3>Smart Automation</h3>
+            <p>Robotics and AI-enhanced factory controls</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1494961104209-3c223057bd26?w=400" alt="Smart Logistics" class="card-image">
+            <h3>Smart Logistics</h3>
+            <p>Supply chain digitization and optimization</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400" alt="Compliance" class="card-image">
+            <h3>Compliance Systems</h3>
+            <p>GMP, FDA, ISO support for regulated industries</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=400" alt="Cybersecurity" class="card-image">
+            <h3>Cybersecurity</h3>
+            <p>Data governance and risk mitigation</p>
+        </div>
+        <!-- New Card: ERP -->
+        <div class="card">
+            <img src="https://www.appventurez.com/wp-content/uploads/2024/08/unnamed.png?w=400" alt="ERP Systems" class="card-image">
+            <h3>ERP Systems</h3>
+            <p>Integrated enterprise resource planning for seamless operations</p>
+        </div>
+        <!-- New Card: World Economic Forum -->
+        <div class="card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjfbXqxIzCZdcHxtuWPkOkf0-nQkAJeFEUkA&s?w=400" alt="World Economic Forum" class="card-image">
+            <h3>World Economic Forum Collaboration</h3>
+            <p>Support for Global Lighthouse Network recognition and 4IR transformation</p>
+        </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Why Choose Us</h2>
+        <div class="why-choose-grid">
+        <div class="card">
+            <img src="https://static.vecteezy.com/system/resources/previews/022/717/144/non_2x/free-digital-global-connection-network-technology-background-generat-ai-free-photo.jpg?w=400" alt="Global Presence" class="card-image">
+            <h3>We are global.</h3>
+            <p>No matter where you are, we've got you covered.</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1596742578443-7682ef5251cd?w=400" alt="Virtual Assistant" class="card-image">
+            <h3>Virtual assistance.</h3>
+            <p>Talk to us about any concerns, 24/7.</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1552581234-26160f608093?w=400" alt="Client Value" class="card-image">
+            <h3>We value our clients.</h3>
+            <p>Our interface is simple and easy to use.</p>
+        </div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?w=400" alt="Top Systems" class="card-image">
+            <h3>Top-rated systems.</h3>
+            <p>We use top-rated software and systems to ensure quality.</p>
+        </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Contact Us</h2>
+        <div class="contact-cards">
+            <div class="card">
+            <p><strong>Book a Free Consultation</strong></p>
+            <p>Let's discuss how we can help you achieve your goals.</p>
+            <p>Email: 
+                <a href="mailto:praveenyvv@clstechai.com">
+                praveenyvv@clstechai.com
+                </a>
+            </p>
+            </div>
+            <div class="card">
+            <p><strong>Connect with our HR Team</strong></p>
+            <p>We're here to answer your questions and explore opportunities together.</p>
+            <p>Email: 
+                <a href="mailto:hr@clstechai.com">
+                hr@clstechai.com
+                </a>
+            </p>
+            </div>
+        </div>
+      </section>
+  </main>
+
+  <footer>
+    &copy; 2025 CLS TECH AI. All rights reserved.
+  </footer>
+</body>
+</html>
