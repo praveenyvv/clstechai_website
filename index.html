@@ -725,23 +725,79 @@
       .footer-inner { flex-direction: column; align-items: flex-start; }
       .nav-customer-login .label { display: none; }
     }
+    /* Add this anywhere in your CSS */
+.mobile-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--white);
+}
+
+/* Replace your existing @media (max-width: 900px) and 600px with this: */
+@media (max-width: 900px) {
+  .mobile-toggle { display: block; }
+  
+  /* Create a dropdown menu for mobile */
+  .nav-links, .nav-right { 
+    display: none; 
+    flex-direction: column; 
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* When JS adds the 'active' class, show the menu */
+  nav.active {
+    flex-direction: column;
+    background: var(--navy);
+    height: auto;
+    padding: 1rem 1.5rem;
+  }
+  nav.active .nav-links, nav.active .nav-right {
+    display: flex;
+    padding: 1rem 0;
+  }
+  
+  .hero-stats { display: none; }
+  .about-wrap, .industries-wrap, .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .about-badge { right: auto; left: 1rem; bottom: -1rem; }
+  .hero { padding-top: 120px; }
+  .industry-visual { position: relative; top: 0; }
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 2.2rem; }
+  .cta-banner { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+}
   </style>
 </head>
 <body>
 
   <!-- NAV -->
-  <nav>
-    <div class="nav-logo">
-      <img src="logo.jpg" alt="CLS Tech AI">
-      <span>CLS</span>&nbsp;TECH AI
-    </div>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#industries">Industries</a></li>
-      <li><a href="#why">Why Us</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
+<nav>
+  <div class="nav-logo">
+    <img src="logo.jpg" alt="CLS Tech AI">
+    <span>CLS</span>&nbsp;TECH AI
+  </div>
+  
+  <div class="mobile-toggle" id="mobile-toggle">☰</div>
+
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#industries">Industries</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  
+  <div class="nav-right" id="nav-right">
+    <a href="customer-login.html" class="nav-customer-login">
+      <span class="lock-icon">🔒</span>
+      <span class="label">Customer Login</span>
+    </a>
+    <a href="#contact" class="nav-cta">Get in Touch</a>
+  </div>
+</nav>
     <!-- NAV RIGHT: Customer Login + Get in Touch -->
     <div class="nav-right">
       <a href="customer-login.html" class="nav-customer-login">
@@ -1031,6 +1087,11 @@
         a.style.color = a.getAttribute('href') === '#' + current ? 'var(--white)' : '';
       });
     }, { passive: true });
+
+    // Mobile menu toggle logic
+    document.getElementById('mobile-toggle').addEventListener('click', function() {
+    document.querySelector('nav').classList.toggle('active');
+    });
   </script>
 </body>
 </html>
