@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dr. Reddy's Login — CLS Tech AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #050d1f;
+      --navy-mid: #0b1530;
+      --navy-card: #0f1d3a;
+      --navy-border: #1a2d52;
+      --cyan: #00d4ff;
+      --cyan-dim: rgba(0,212,255,0.10);
+      --cyan-glow: rgba(0,212,255,0.25);
+      --white: #f0f6ff;
+      --muted: #7a93b8;
+      --error: #e24b4a;
+      --heading: 'Syne', sans-serif;
+      --body: 'Inter', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--body);
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /* Compact vertical padding so card fits without scrolling */
+      padding: 1rem 1rem;
+      overflow-y: auto;
+    }
+
+    .bg-fx {
+      position: fixed; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 45% at 75% 25%, rgba(0,212,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 20% 75%, rgba(0,80,180,0.07) 0%, transparent 55%);
+    }
+    .bg-grid {
+      position: fixed; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(26,45,82,0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,45,82,0.22) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+    }
+
+    /* LOGIN WRAP — compact, fits any screen */
+    .login-wrap {
+      position: relative; z-index: 1;
+      width: 100%;
+      max-width: 400px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.78rem; color: var(--muted);
+      margin-bottom: 0.9rem;
+      transition: color 0.2s; cursor: pointer;
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--white); }
+
+    .login-card {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: 14px;
+      /* Reduced padding so card is compact */
+      padding: 1.75rem 2rem;
+    }
+
+    .login-header {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; margin-bottom: 1.4rem;
+    }
+
+    .company-badge {
+      width: 52px; height: 52px;
+      background: var(--cyan-dim);
+      border: 1px solid var(--cyan-glow);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 0.75rem;
+    }
+
+    .login-header h1 {
+      font-family: var(--heading);
+      font-size: 1.2rem; font-weight: 800;
+      letter-spacing: -0.01em; margin-bottom: 0.25rem;
+    }
+    .login-header p {
+      font-size: 0.78rem; color: var(--muted); line-height: 1.5;
+    }
+    .login-header .powered {
+      font-size: 0.68rem; color: var(--muted);
+      display: flex; align-items: center; gap: 0.3rem;
+      margin-top: 0.4rem;
+    }
+    .powered span { color: var(--cyan); font-weight: 600; }
+
+    /* FORM */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .form-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--navy-border);
+      border-radius: 7px;
+      padding: 0.62rem 0.9rem;
+      font-size: 0.9rem; font-family: var(--body);
+      color: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-group input::placeholder { color: rgba(122,147,184,0.5); }
+    .form-group input:focus {
+      border-color: var(--cyan-glow);
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+    }
+    .form-group input.error-field {
+      border-color: rgba(226,75,74,0.6);
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(226,75,74,0.1);
+      border: 1px solid rgba(226,75,74,0.3);
+      border-radius: 7px;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.78rem; color: var(--error);
+      margin-bottom: 1rem;
+      align-items: center; gap: 0.5rem;
+    }
+    .error-msg.visible { display: flex; }
+
+    .btn-login {
+      width: 100%;
+      background: var(--cyan);
+      color: var(--navy);
+      font-family: var(--heading);
+      font-weight: 700; font-size: 0.9rem;
+      padding: 0.72rem;
+      border: none; border-radius: 7px;
+      cursor: pointer; letter-spacing: 0.03em;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-login:hover {
+      opacity: 0.9; transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(0,212,255,0.25);
+    }
+    .btn-login:active { transform: none; }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .form-footer {
+      margin-top: 1.1rem; text-align: center;
+      font-size: 0.74rem; color: var(--muted);
+    }
+    .form-footer a { color: var(--cyan); }
+
+    .spinner {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(5,13,31,0.3);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 6px; vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .secure-badge {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.4rem; margin-top: 1rem;
+      font-size: 0.68rem; color: rgba(122,147,184,0.55);
+    }
+    .secure-badge::before { content: '🔒'; font-size: 0.7rem; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-fx"></div>
+  <div class="bg-grid"></div>
+
+  <div class="login-wrap">
+    <a href="customer-login.html" class="back-link">← Back to Portal</a>
+
+    <div class="login-card">
+      <div class="login-header">
+        <div class="company-badge">🧪</div>
+        <h1>Dr. Reddy's Laboratories</h1>
+        <p>Sign in to access your operations dashboard</p>
+        <div class="powered">Powered by <span>CLS Tech AI</span></div>
+      </div>
+
+      <div class="error-msg" id="errorMsg">⚠️ Invalid credentials. Please try again.</div>
+
+      <div class="form-group">
+        <label for="loginId">Login ID</label>
+        <input type="text" id="loginId" placeholder="Enter your login ID" autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+
+      <button class="btn-login" id="loginBtn" onclick="handleLogin()">
+        Sign In to Dashboard
+      </button>
+
+      <div class="form-footer">
+        Need access? <a href="mailto:praveenyvv@clstechai.com">Contact CLS Tech AI</a>
+      </div>
+    </div>
+
+    <div class="secure-badge">Secured by CLS Tech AI · End-to-end encrypted session</div>
+  </div>
+
+  <script>
+    const CREDENTIALS = { loginId: '12345', password: '12345' };
+    const SESSION_KEY = 'cls_drl_auth';
+    const SESSION_TOKEN = 'drl_auth_granted_2025';
+
+    if (sessionStorage.getItem(SESSION_KEY) === SESSION_TOKEN) {
+      window.location.replace('drl_dashboard.html');
+    }
+
+    function handleLogin() {
+      const loginId = document.getElementById('loginId').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('loginBtn');
+      const errEl = document.getElementById('errorMsg');
+
+      errEl.classList.remove('visible');
+      document.getElementById('loginId').classList.remove('error-field');
+      document.getElementById('password').classList.remove('error-field');
+
+      if (!loginId || !password) {
+        errEl.textContent = '⚠️ Please fill in both fields.';
+        errEl.classList.add('visible');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+      setTimeout(() => {
+        if (loginId === CREDENTIALS.loginId && password === CREDENTIALS.password) {
+          sessionStorage.setItem(SESSION_KEY, SESSION_TOKEN);
+          btn.innerHTML = '✓ Access Granted — Redirecting…';
+          setTimeout(() => { window.location.replace('drl_dashboard.html'); }, 600);
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = 'Sign In to Dashboard';
+          errEl.textContent = '⚠️ Invalid credentials. Please try again.';
+          errEl.classList.add('visible');
+          document.getElementById('loginId').classList.add('error-field');
+          document.getElementById('password').classList.add('error-field');
+        }
+      }, 900);
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  </script>
+
+</body>
+</html>
