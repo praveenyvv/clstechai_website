@@ -1,256 +1,368 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRL Operations Dashboard</title>
 <style>
-  .dash { padding: 1rem 0; font-family: var(--font-sans, system-ui, sans-serif); }
-  .section-label { font-size: 13px; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
-  .sr-only { position:absolute;left:-9999px; }
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f4f4f5;
+    --color-border-tertiary: #e4e4e7;
+    --color-text-primary: #18181b;
+    --color-text-secondary: #52525b;
+    --color-text-tertiary: #a1a1aa;
+    --border-radius-md: 6px;
+    --border-radius-lg: 10px;
+    --cyan: #00d4ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #0f1d3a;
+      --color-background-secondary: #1a2d52;
+      --color-border-tertiary: #1a2d52;
+      --color-text-primary: #f0f6ff;
+      --color-text-secondary: #7a93b8;
+      --color-text-tertiary: #4a5d7c;
+    }
+    body { background: #050d1f; color: var(--color-text-primary); }
+  }
+
+  body { margin: 0; font-family: system-ui, sans-serif; }
+  .dash { padding: 1rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+  
+  /* Tabs Navigation */
+  .sys-tabs { 
+    display: flex; gap: 8px; margin-bottom: 1.5rem; 
+    border-bottom: 2px solid var(--color-border-tertiary); padding-bottom: 8px; 
+    overflow-x: auto;
+  }
+  .sys-tab { 
+    padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; 
+    border: none; background: transparent; color: var(--color-text-secondary); 
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .sys-tab:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .sys-tab.active { 
+    color: var(--color-text-primary); 
+    border-bottom: 3px solid #00d4ff; 
+    margin-bottom: -10px;
+  }
+  .tab-pane { display: none; animation: fadeIn 0.3s ease; }
+  .tab-pane.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* General UI elements */
+  .section-label { font-size: 13px; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
   .controls { display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap; }
-  .ctrl-btn { font-size:13px;font-weight:500;padding:6px 14px;cursor:pointer;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);transition:all .15s; }
-  .ctrl-btn:hover { background:var(--color-background-secondary); }
-  .ctrl-btn.active { background:var(--color-text-primary);color:#fff;border-color:var(--color-text-primary); }
   .last-update { font-size:12px;color:var(--color-text-tertiary);margin-left:auto;font-style:italic; }
-  .cards { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:2rem; }
-  .card { background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 18px;position:relative;transition:transform .2s;display:flex;flex-direction:column; }
-  .card:hover { transform:translateY(-2px); }
-  .card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:8px; }
-  .beacon-name { font-size:14px;font-weight:500;color:var(--color-text-primary);margin:0; }
-  .beacon-id { font-size:10px;color:var(--color-text-tertiary);background:var(--color-background-secondary);padding:3px 6px;border-radius:4px;margin:0; }
-  .val-wrapper { display:flex;align-items:baseline;gap:6px;margin-bottom:10px; }
-  .val-value { font-size:32px;font-weight:500;margin:0;line-height:1;letter-spacing:-0.02em; }
-  .val-unit { font-size:12px;color:var(--color-text-secondary); }
-  .status-row { display:flex;align-items:center;font-size:12px;color:var(--color-text-secondary);margin-top:auto;padding-top:10px;border-top:0.5px dashed var(--color-border-tertiary); }
-  .status-dot { width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px; }
-  .trend { margin-left:auto;font-size:12px;font-weight:500;background:var(--color-background-secondary);padding:2px 6px;border-radius:6px; }
-  .heatmap-wrap { background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:2rem; }
-  .heatmap-grid { display:grid;grid-template-columns:64px repeat(12,1fr);gap:4px;align-items:center; }
-  .hm-label { font-size:12px;font-weight:500;color:var(--color-text-secondary);text-align:right;padding-right:12px; }
-  .hm-time { font-size:10px;color:var(--color-text-tertiary);text-align:center;margin-bottom:4px; }
-  .hm-cell { height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:default;transition:transform .15s; }
-  .hm-cell:hover { transform:scale(1.06);z-index:10; }
-  .legend { display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--color-text-secondary); }
-  .legend-bar { display:flex;gap:2px; }
-  .legend-swatch { width:18px;height:10px;border-radius:2px; }
-  .chart-wrap { background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:2rem; }
-  .divider { border:none;border-top:0.5px solid var(--color-border-tertiary);margin:2rem 0; }
-  .section-block-title { font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px; }
-  .section-block-sub { font-size:12px;color:var(--color-text-tertiary);margin:0 0 1.25rem; }
+  .btn-reset { font-size: 12px; padding: 4px 10px; background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); border-radius: 4px; cursor: pointer; transition: 0.2s;}
+  .btn-reset:hover { background: var(--color-border-tertiary); }
+  
+  /* Cards */
+  .cards { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:2rem; }
+  .card { background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px 20px;position:relative;transition:transform .2s;display:flex;flex-direction:column; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .card:hover { transform:translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--color-border-tertiary);padding-bottom:8px; }
+  .item-name { font-size:15px;font-weight:600;color:var(--color-text-primary);margin:0; }
+  .item-id { font-size:11px;color:var(--color-text-tertiary);background:var(--color-background-secondary);padding:3px 6px;border-radius:4px;margin:0; font-family: monospace; }
+  
+  .val-wrapper { display:flex;align-items:baseline;gap:6px;margin-bottom:6px; }
+  .val-value { font-size:32px;font-weight:600;margin:0;line-height:1;letter-spacing:-0.02em; }
+  .val-unit { font-size:13px;color:var(--color-text-secondary); font-weight: 500; }
+  
+  .sub-metrics { font-size:12px; color:var(--color-text-secondary); margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px;}
+  .sub-metric-row { display: flex; justify-content: space-between; background: var(--color-background-secondary); padding: 4px 8px; border-radius: 4px; }
+  
+  .status-row { display:flex;align-items:center;font-size:12px;color:var(--color-text-secondary);margin-top:auto;padding-top:12px;border-top:1px dashed var(--color-border-tertiary); }
+  .status-dot { width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px; box-shadow: 0 0 4px currentColor;}
+  .trend { margin-left:auto;font-size:12px;font-weight:600; }
+
+  /* Charts */
+  .chart-wrap { background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:2rem; }
+  
+  /* Highlight Totalizer */
+  .totalizer-box { background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); color: var(--color-text-primary); padding: 8px; border-radius: 6px; margin-top: 8px; text-align: center;}
+  .totalizer-val { font-size: 18px; font-weight: 700; color: #00b8d4; }
 </style>
+</head>
+<body>
 
-<div class="dash" style="padding:1rem 1.5rem;">
-  <h2 class="sr-only">DRL Operations Dashboard — Temperature and Flow Monitoring</h2>
-
+<div class="dash">
   <div class="controls">
-    <span style="font-size:14px;font-weight:500;color:var(--color-text-primary);">BLE Beacon Monitor</span>
-    <div style="width:1px;height:20px;background:var(--color-border-tertiary);margin:0 6px;"></div>
-    <button class="ctrl-btn active" onclick="setUnit('C',this)">°C</button>
-    <button class="ctrl-btn" onclick="setUnit('F',this)">°F</button>
-    <button class="ctrl-btn" style="margin-left:4px" onclick="simulateFetch()">↻ Refresh</button>
+    <span style="font-size:18px;font-weight:700;color:var(--color-text-primary); font-family: 'Syne', sans-serif;">🧪 Operations Dashboard</span>
+    
+    <div style="width:1px;height:20px;background:var(--color-border-tertiary);margin:0 10px;"></div>
+    
+    <button class="btn-reset" onclick="resetCurrentZoom()">⟲ Reset Chart Zoom</button>
     <span class="last-update" id="last-update">Connecting…</span>
   </div>
 
-  <!-- ── TEMPERATURE ── -->
-  <p class="section-label">Temperature — live readings</p>
-  <div class="cards" id="cards"></div>
+  <div class="sys-tabs">
+    <button class="sys-tab" onclick="switchTab('fire', this)">🔥 Fire Systems</button>
+    <button class="sys-tab" onclick="switchTab('motor', this)">⚙️ Motor Systems</button>
+    <button class="sys-tab active" onclick="switchTab('flow', this)">💧 Flow Meters</button>
+  </div>
 
-  <p class="section-label">Temperature — heat map (last 12)</p>
-  <div class="heatmap-wrap">
-    <div class="heatmap-grid" id="heatmap"></div>
-    <div class="legend">
-      <span>Cool</span>
-      <div class="legend-bar" id="legend-bar"></div>
-      <span>Hot</span>
+  <div id="fire-pane" class="tab-pane">
+    <p class="section-label">Fire Prevention & Detection Zones</p>
+    <div class="cards" id="fire-cards"></div>
+    
+    <p class="section-label">Smoke Level Trend (% Obscuration) - Drag to Zoom</p>
+    <div class="chart-wrap">
+      <div style="position:relative;width:100%;height:240px;">
+        <canvas id="fireChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <p class="section-label">Temperature — trend</p>
-  <div class="chart-wrap">
-    <div style="position:relative;width:100%;height:240px;">
-      <canvas id="trendChart"></canvas>
+  <div id="motor-pane" class="tab-pane">
+    <p class="section-label">Industrial Motors & Pumps</p>
+    <div class="cards" id="motor-cards"></div>
+    <p class="section-label">Motor RPM Trend - Drag to Zoom</p>
+    <div class="chart-wrap">
+      <div style="position:relative;width:100%;height:240px;">
+        <canvas id="motorChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <hr class="divider">
+  <div id="flow-pane" class="tab-pane active">
+    <p class="section-label">Flow meters — Live Rate & Totalizer</p>
+    <div class="cards" id="flow-cards"></div>
 
-  <!-- ── FLOW METERS ── -->
-  <p class="section-label">Flow meters — live readings</p>
-  <div class="cards" id="flow-cards"></div>
-
-  <p class="section-label">Flow meters — heat map (last 12)</p>
-  <div class="heatmap-wrap">
-    <div class="heatmap-grid" id="flow-heatmap"></div>
-    <div class="legend">
-      <span>Low</span>
-      <div class="legend-bar" id="flow-legend-bar"></div>
-      <span>High</span>
+    <p class="section-label">Flow Rate Trend (L/min) - Drag to Zoom</p>
+    <div class="chart-wrap">
+      <div style="position:relative;width:100%;height:260px;">
+        <canvas id="flowChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <p class="section-label">Flow meters — trend</p>
-  <div class="chart-wrap">
-    <div style="position:relative;width:100%;height:220px;">
-      <canvas id="flowChart"></canvas>
-    </div>
-  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+
 <script>
-const BEACONS = [
-  { id:'B-001', name:'Zone A', mac:'AA:BB:CC:01' },
-  { id:'B-002', name:'Zone B', mac:'AA:BB:CC:02' },
-  { id:'B-003', name:'Zone C', mac:'AA:BB:CC:03' },
-  { id:'B-004', name:'Zone D', mac:'AA:BB:CC:04' },
-  { id:'B-005', name:'Zone E', mac:'AA:BB:CC:05' },
+// --- DATA DEFINITIONS ---
+
+const FIRE_ZONES = [
+  { id: 'FZ-01', name: 'Raw Material Warehouse', mac: 'FS:01' },
+  { id: 'FZ-02', name: 'Packaging Line A', mac: 'FS:02' },
+  { id: 'FZ-03', name: 'Chemical Storage', mac: 'FS:03' }
+];
+
+const MOTORS = [
+  { id: 'MTR-1', name: 'Main Chiller Pump', mac: 'MT:A1' },
+  { id: 'MTR-2', name: 'Exhaust Fan A', mac: 'MT:A2' },
+  { id: 'MTR-3', name: 'Conveyor Drive', mac: 'MT:A3' }
 ];
 
 const FLOW_METERS = [
-  { id:'ETp-1', name:'ETp-1', mac:'FM:01', label:'Effluent Transfer — Line 1' },
-  { id:'ETp-2', name:'ETp-2', mac:'FM:02', label:'Effluent Transfer — Line 2' },
+  { id:'ETp-1', name:'Effluent Line 1', mac:'FM:01', totalizer: 14520.5 },
+  { id:'ETp-2', name:'Effluent Line 2', mac:'FM:02', totalizer: 32904.1 },
 ];
 
-const TEMP_COLORS  = ['#378ADD','#1D9E75','#EF9F27','#D4537E','#7F77DD'];
-const FLOW_COLORS  = ['#0FA3B1','#E76F51'];
+const FIRE_COLORS = ['#E24B4A', '#EF9F27', '#7F77DD'];
+const FLOW_COLORS = ['#0FA3B1','#E76F51'];
+const MOTOR_COLORS = ['#378ADD','#EF9F27','#7F77DD'];
+const INTERVAL_MS = 10000; // 10 seconds
 
-const FLOW_UNIT    = 'L/min';
-const FLOW_MIN     = 0;
-const FLOW_MAX     = 120;
-const FLOW_WARN    = 90;   // high-flow threshold
-const FLOW_LOW     = 10;   // low-flow / stall threshold
-
-let unit = 'C';
-let tempHistory = BEACONS.map(() => []);
+let fireHistory = FIRE_ZONES.map(() => []);
+let motorHistory = MOTORS.map(() => []);
 let flowHistory = FLOW_METERS.map(() => []);
-let trendChart  = null;
-let flowChart   = null;
 
-function toUnit(c) { return unit === 'C' ? c : c * 9/5 + 32; }
-function fmtTemp(c) { return toUnit(c).toFixed(1) + '°' + unit; }
-function fmtFlow(v) { return v.toFixed(1) + ' ' + FLOW_UNIT; }
+let fireChart = null;
+let motorChart = null;
+let flowChart = null;
+let currentTab = 'flow';
 
-function heatColor(norm) {
-  const stops = [[59,130,246],[34,197,94],[250,204,21],[249,115,22],[239,68,68]];
-  const n = Math.max(0, Math.min(1, norm));
-  const idx = n * (stops.length - 1);
-  const lo = stops[Math.floor(idx)], hi = stops[Math.ceil(idx)];
-  const t = idx - Math.floor(idx);
-  const r = Math.round(lo[0]+(hi[0]-lo[0])*t), g = Math.round(lo[1]+(hi[1]-lo[1])*t), b = Math.round(lo[2]+(hi[2]-lo[2])*t);
-  return { bg:`rgb(${r},${g},${b})`, text: n>0.6||n<0.2 ? '#fff' : '#1a1a1a' };
+// --- UTILS ---
+function getTimeLabels(n) {
+  return Array.from({length:n}, (_,i) => {
+    const d = new Date(Date.now() - (n-1-i) * INTERVAL_MS);
+    return d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
+  });
 }
 
-function flowHeatColor(norm) {
-  const stops = [[219,234,254],[147,197,253],[59,130,246],[29,78,216],[30,27,75]];
-  const n = Math.max(0, Math.min(1, norm));
-  const idx = n * (stops.length - 1);
-  const lo = stops[Math.floor(idx)], hi = stops[Math.ceil(idx)];
-  const t = idx - Math.floor(idx);
-  const r = Math.round(lo[0]+(hi[0]-lo[0])*t), g = Math.round(lo[1]+(hi[1]-lo[1])*t), b = Math.round(lo[2]+(hi[2]-lo[2])*t);
-  return { bg:`rgb(${r},${g},${b})`, text: n>0.55 ? '#fff' : '#1a1a1a' };
+function formatNum(num) {
+  return new Intl.NumberFormat('en-US').format(num);
 }
 
-function buildLegend(id, colorFn) {
-  const bar = document.getElementById(id);
-  bar.innerHTML = '';
-  for (let i = 0; i <= 10; i++) {
-    const c = colorFn(i / 10);
-    const s = document.createElement('div');
-    s.className = 'legend-swatch'; s.style.background = c.bg;
-    bar.appendChild(s);
+// Global Zoom Config for all charts
+const zoomConfig = {
+  zoom: {
+    drag: {
+      enabled: true,
+      backgroundColor: 'rgba(0, 212, 255, 0.2)' // Cyan rubber band box
+    },
+    mode: 'x', // Only allow horizontal zooming
+  }
+};
+
+function resetCurrentZoom() {
+  if(currentTab === 'fire' && fireChart) fireChart.resetZoom();
+  if(currentTab === 'motor' && motorChart) motorChart.resetZoom();
+  if(currentTab === 'flow' && flowChart) flowChart.resetZoom();
+}
+
+// --- TAB SWITCHING ---
+function switchTab(tabId, btnElement) {
+  currentTab = tabId;
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sys-tab').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById(tabId + '-pane').classList.add('active');
+  btnElement.classList.add('active');
+
+  // Trigger chart renders to fix canvas sizing when unhidden
+  if(tabId === 'fire') renderFireChart();
+  if(tabId === 'motor') renderMotorChart();
+  if(tabId === 'flow') renderFlowChart();
+}
+
+
+// --- 1. FIRE SYSTEMS RENDER ---
+function renderFireCards(data) {
+  const wrap = document.getElementById('fire-cards');
+  wrap.innerHTML = '';
+  data.forEach(d => {
+    const isAlert = d.smokeLevel > 15;
+    const statusText = isAlert ? 'Smoke Detected' : 'System Normal';
+    const statusColor = isAlert ? '#E24B4A' : '#1D9E75';
+    
+    wrap.innerHTML += `
+      <div class="card" style="border-color: ${isAlert ? '#E24B4A' : 'var(--color-border-tertiary)'}">
+        <div class="card-header">
+          <span class="item-name">${d.name}</span>
+          <span class="item-id">${d.id}</span>
+        </div>
+        <div class="sub-metrics">
+          <div class="sub-metric-row"><span>Smoke Level:</span> <strong>${d.smokeLevel.toFixed(1)} % / Obscuration</strong></div>
+          <div class="sub-metric-row"><span>Water Pressure:</span> <strong>${d.pressure} PSI</strong></div>
+          <div class="sub-metric-row"><span>Sprinkler Valve:</span> <strong>${d.valveOpen ? 'OPEN / ACTIVE' : 'Closed / Standby'}</strong></div>
+        </div>
+        <div class="status-row">
+          <span class="status-dot" style="background:${statusColor}; color:${statusColor}"></span>
+          <span style="color:${statusColor};font-weight:600">${statusText}</span>
+        </div>
+      </div>`;
+  });
+}
+
+function renderFireChart() {
+  if (currentTab !== 'fire') return;
+  const labels = getTimeLabels(15);
+  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  const datasets = FIRE_ZONES.map((z,i) => ({
+    label: z.name + ' (Smoke %)',
+    data: fireHistory[i].slice(-15),
+    borderColor: FIRE_COLORS[i], backgroundColor: FIRE_COLORS[i]+'18',
+    borderWidth:2, pointRadius:3, tension:0.4, fill:true,
+  }));
+
+  // Update existing chart instead of destroying to PRESERVE user zoom state
+  if (fireChart) {
+    fireChart.data.labels = labels;
+    fireChart.data.datasets = datasets;
+    fireChart.update('none'); 
+  } else {
+    fireChart = new Chart(document.getElementById('fireChart'), {
+      type:'line', data:{ labels, datasets },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ 
+          legend:{ labels:{ color:isDark?'#b4b2a9':'#5f5e5a' } },
+          zoom: zoomConfig
+        },
+        scales:{
+          x:{ ticks:{color:isDark?'#888':'#999'} },
+          y:{ min:0, ticks:{color:isDark?'#888':'#999', callback:v=>v+' %'} }
+        }
+      }
+    });
   }
 }
 
-function getTimeLabels(n, intervalMs) {
-  return Array.from({length:n}, (_,i) => {
-    const d = new Date(Date.now() - (n-1-i) * intervalMs);
-    return d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
-  });
-}
 
-// ── TEMPERATURE ──────────────────────────────────────
-function renderTempCards(data) {
-  const wrap = document.getElementById('cards');
+// --- 2. MOTOR SYSTEMS RENDER ---
+function renderMotorCards(data) {
+  const wrap = document.getElementById('motor-cards');
   wrap.innerHTML = '';
-  data.forEach((d,i) => {
-    const prev = tempHistory[i].length >= 2 ? tempHistory[i][tempHistory[i].length-2] : d.tempC;
-    const delta = d.tempC - prev;
-    const trend = Math.abs(delta) < 0.3 ? '→' : delta > 0 ? '↑' : '↓';
-    const trendCol = Math.abs(delta) < 0.3 ? 'var(--color-text-secondary)' : delta > 0 ? '#EF9F27' : '#378ADD';
-    const ok = d.tempC < 38;
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      <div class="card-header">
-        <span class="beacon-name">${d.name}</span>
-        <span class="beacon-id">${d.mac}</span>
-      </div>
-      <div class="val-wrapper">
-        <span class="val-value" style="color:${TEMP_COLORS[i]}">${fmtTemp(d.tempC)}</span>
-        <span class="val-unit">${unit==='C'?'Celsius':'Fahrenheit'}</span>
-      </div>
-      <div class="status-row">
-        <span class="status-dot" style="background:${ok?'#1D9E75':'#E24B4A'}"></span>
-        <span style="color:${ok?'var(--color-text-secondary)':'#E24B4A'};font-weight:${ok?'400':'500'}">${ok?'Normal':'High temp'}</span>
-        <span class="trend" style="color:${trendCol}">${trend} ${Math.abs(toUnit(d.tempC)-toUnit(prev)).toFixed(1)}°</span>
+  data.forEach((d, i) => {
+    const prev = motorHistory[i].length >= 2 ? motorHistory[i][motorHistory[i].length-2] : d.rpm;
+    const trend = d.rpm > prev ? '↑' : d.rpm < prev ? '↓' : '→';
+    const isWarning = d.temp > 75;
+    const statusColor = isWarning ? '#EF9F27' : '#1D9E75';
+
+    wrap.innerHTML += `
+      <div class="card">
+        <div class="card-header">
+          <span class="item-name">${d.name}</span>
+          <span class="item-id">${d.id}</span>
+        </div>
+        <div class="val-wrapper">
+          <span class="val-value" style="color:${MOTOR_COLORS[i]}">${d.rpm.toFixed(0)}</span>
+          <span class="val-unit">RPM</span>
+        </div>
+        <div class="sub-metrics">
+          <div class="sub-metric-row"><span>Casing Temp:</span> <strong style="color:${isWarning?'#EF9F27':'inherit'}">${d.temp.toFixed(1)} °C</strong></div>
+          <div class="sub-metric-row"><span>Vibration (RMS):</span> <strong>${d.vibration.toFixed(2)} mm/s</strong></div>
+        </div>
+        <div class="status-row">
+          <span class="status-dot" style="background:${statusColor}; color:${statusColor}"></span>
+          <span style="color:${statusColor};font-weight:500">${isWarning ? 'High Temp Warn' : 'Running Smooth'}</span>
+          <span class="trend">${trend} ${Math.abs(d.rpm - prev).toFixed(0)}</span>
+        </div>
       </div>`;
-    wrap.appendChild(div);
   });
 }
 
-function renderTempHeatmap() {
-  const wrap = document.getElementById('heatmap');
-  wrap.innerHTML = '';
-  const times = getTimeLabels(12, 30000);
-  wrap.appendChild(document.createElement('div'));
-  times.forEach(t => {
-    const el = document.createElement('div'); el.className = 'hm-time'; el.textContent = t; wrap.appendChild(el);
-  });
-  BEACONS.forEach((b,bi) => {
-    const lbl = document.createElement('div'); lbl.className = 'hm-label'; lbl.textContent = b.name; wrap.appendChild(lbl);
-    const row = tempHistory[bi].slice(-12);
-    while (row.length < 12) row.unshift(null);
-    row.forEach(v => {
-      const cell = document.createElement('div'); cell.className = 'hm-cell';
-      if (v !== null) {
-        const {bg,text} = heatColor((v-20)/25);
-        cell.style.background = bg; cell.style.color = text;
-        cell.textContent = Math.round(toUnit(v));
-        cell.title = `${b.name}: ${fmtTemp(v)}`;
-      } else { cell.style.background = 'var(--color-background-secondary)'; }
-      wrap.appendChild(cell);
-    });
-  });
-}
-
-function renderTempChart() {
-  const labels = getTimeLabels(12, 30000);
+function renderMotorChart() {
+  if (currentTab !== 'motor') return;
+  const labels = getTimeLabels(15);
   const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-  const threshVal = parseFloat(toUnit(38).toFixed(1));
-  const datasets = BEACONS.map((b,i) => ({
-    label: b.name,
-    data: tempHistory[i].slice(-12).map(v => parseFloat(toUnit(v).toFixed(1))),
-    borderColor: TEMP_COLORS[i], backgroundColor: TEMP_COLORS[i]+'18',
-    borderWidth:2, pointRadius:4, pointHoverRadius:7, tension:0.4, fill:false,
+  
+  const datasets = MOTORS.map((m,i) => ({
+    label: m.name,
+    data: motorHistory[i].slice(-15),
+    borderColor: MOTOR_COLORS[i], backgroundColor: MOTOR_COLORS[i]+'18',
+    borderWidth:2, pointRadius:3, tension:0.4, fill:true,
   }));
-  if (trendChart) trendChart.destroy();
-  trendChart = new Chart(document.getElementById('trendChart'), {
-    type:'line', data:{ labels, datasets },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{
-        legend:{ display:true, position:'top', labels:{ usePointStyle:true, boxWidth:8, font:{size:12}, color:isDark?'#b4b2a9':'#5f5e5a' } },
-        tooltip:{ backgroundColor:isDark?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.95)', titleColor:isDark?'#fff':'#111', bodyColor:isDark?'#ccc':'#444', borderColor:isDark?'#333':'#eee', borderWidth:1, padding:10, usePointStyle:true },
-        annotation:{ annotations:{ dangerZone:{ type:'line', yMin:threshVal, yMax:threshVal, borderColor:'rgba(226,75,74,0.55)', borderWidth:2, borderDash:[6,4], label:{ display:true, content:`High temp (${threshVal.toFixed(0)}°${unit})`, position:'end', backgroundColor:'rgba(226,75,74,0.9)', color:'#fff', font:{size:10,weight:'bold'}, padding:4 } } } }
-      },
-      scales:{
-        x:{ ticks:{font:{size:11},color:isDark?'#888780':'#999'}, grid:{display:false} },
-        y:{ ticks:{font:{size:11},color:isDark?'#888780':'#999', callback:v=>v+'°'}, grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)',borderDash:[4,4]} }
+
+  if (motorChart) {
+    motorChart.data.labels = labels;
+    motorChart.data.datasets = datasets;
+    motorChart.update('none');
+  } else {
+    motorChart = new Chart(document.getElementById('motorChart'), {
+      type:'line', data:{ labels, datasets },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ 
+          legend:{ labels:{ color:isDark?'#b4b2a9':'#5f5e5a' } },
+          zoom: zoomConfig 
+        },
+        scales:{
+          x:{ ticks:{color:isDark?'#888':'#999'} },
+          y:{ ticks:{color:isDark?'#888':'#999', callback:v=>v+' rpm'} }
+        }
       }
-    }
-  });
+    });
+  }
 }
 
-// ── FLOW METERS ──────────────────────────────────────
+
+// --- 3. FLOW METERS RENDER ---
 function renderFlowCards(data) {
   const wrap = document.getElementById('flow-cards');
   wrap.innerHTML = '';
@@ -258,124 +370,136 @@ function renderFlowCards(data) {
     const prev = flowHistory[i].length >= 2 ? flowHistory[i][flowHistory[i].length-2] : d.flow;
     const delta = d.flow - prev;
     const trend = Math.abs(delta) < 0.5 ? '→' : delta > 0 ? '↑' : '↓';
-    const trendCol = Math.abs(delta) < 0.5 ? 'var(--color-text-secondary)' : delta > 0 ? '#EF9F27' : '#378ADD';
-    const isHigh = d.flow > FLOW_WARN;
-    const isLow  = d.flow < FLOW_LOW;
-    const statusOk = !isHigh && !isLow;
-    const statusText = isHigh ? 'High flow' : isLow ? 'Low / stall' : 'Normal';
-    const statusColor = isHigh ? '#E24B4A' : isLow ? '#EF9F27' : '#1D9E75';
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      <div class="card-header">
-        <span class="beacon-name">${d.name}</span>
-        <span class="beacon-id">${d.id}</span>
-      </div>
-      <div class="val-wrapper">
-        <span class="val-value" style="color:${FLOW_COLORS[i]}">${fmtFlow(d.flow)}</span>
-      </div>
-      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;">${d.label}</div>
-      <div class="status-row">
-        <span class="status-dot" style="background:${statusColor}"></span>
-        <span style="color:${statusColor};font-weight:${statusOk?'400':'500'}">${statusText}</span>
-        <span class="trend" style="color:${trendCol}">${trend} ${Math.abs(d.flow - prev).toFixed(1)} L/min</span>
-      </div>`;
-    wrap.appendChild(div);
-  });
-}
+    const statusOk = d.flow > 10 && d.flow < 90;
+    const statusColor = statusOk ? '#1D9E75' : '#E24B4A';
+    
+    wrap.innerHTML += `
+      <div class="card">
+        <div class="card-header">
+          <span class="item-name">${d.name}</span>
+          <span class="item-id">${d.id}</span>
+        </div>
+        <div class="val-wrapper">
+          <span class="val-value" style="color:${FLOW_COLORS[i]}">${d.flow.toFixed(1)}</span>
+          <span class="val-unit">L/min (Live Rate)</span>
+        </div>
+        
+        <div class="totalizer-box">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom:2px;">Cumulative Totalizer</div>
+          <div class="totalizer-val">${formatNum(d.totalizer.toFixed(1))} L</div>
+        </div>
 
-function renderFlowHeatmap() {
-  const wrap = document.getElementById('flow-heatmap');
-  wrap.innerHTML = '';
-  const times = getTimeLabels(12, 30000);
-  wrap.appendChild(document.createElement('div'));
-  times.forEach(t => {
-    const el = document.createElement('div'); el.className = 'hm-time'; el.textContent = t; wrap.appendChild(el);
-  });
-  FLOW_METERS.forEach((fm,fi) => {
-    const lbl = document.createElement('div'); lbl.className = 'hm-label'; lbl.textContent = fm.id; wrap.appendChild(lbl);
-    const row = flowHistory[fi].slice(-12);
-    while (row.length < 12) row.unshift(null);
-    row.forEach(v => {
-      const cell = document.createElement('div'); cell.className = 'hm-cell';
-      if (v !== null) {
-        const {bg,text} = flowHeatColor((v - FLOW_MIN) / (FLOW_MAX - FLOW_MIN));
-        cell.style.background = bg; cell.style.color = text;
-        cell.textContent = Math.round(v);
-        cell.title = `${fm.id}: ${fmtFlow(v)}`;
-      } else { cell.style.background = 'var(--color-background-secondary)'; }
-      wrap.appendChild(cell);
-    });
+        <div class="status-row">
+          <span class="status-dot" style="background:${statusColor}; color:${statusColor}"></span>
+          <span style="color:${statusColor};font-weight:${statusOk?'400':'500'}">${statusOk ? 'Flow Nominal' : 'Flow Warning'}</span>
+          <span class="trend" style="color:var(--color-text-secondary)">${trend} ${Math.abs(delta).toFixed(1)}</span>
+        </div>
+      </div>`;
   });
 }
 
 function renderFlowChart() {
-  const labels = getTimeLabels(12, 30000);
+  if (currentTab !== 'flow') return;
+  const labels = getTimeLabels(15);
   const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  
   const datasets = FLOW_METERS.map((fm,i) => ({
-    label: fm.id,
-    data: flowHistory[i].slice(-12).map(v => parseFloat(v.toFixed(1))),
+    label: fm.name + ' (L/min)',
+    data: flowHistory[i].slice(-15),
     borderColor: FLOW_COLORS[i], backgroundColor: FLOW_COLORS[i]+'18',
-    borderWidth:2, pointRadius:4, pointHoverRadius:7, tension:0.4, fill:false,
+    borderWidth:2, pointRadius:3, tension:0.4, fill:false,
   }));
-  if (flowChart) flowChart.destroy();
-  flowChart = new Chart(document.getElementById('flowChart'), {
-    type:'line', data:{ labels, datasets },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{
-        legend:{ display:true, position:'top', labels:{ usePointStyle:true, boxWidth:8, font:{size:12}, color:isDark?'#b4b2a9':'#5f5e5a' } },
-        tooltip:{ backgroundColor:isDark?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.95)', titleColor:isDark?'#fff':'#111', bodyColor:isDark?'#ccc':'#444', borderColor:isDark?'#333':'#eee', borderWidth:1, padding:10, usePointStyle:true },
-        annotation:{ annotations:{
-          highWarn:{ type:'line', yMin:FLOW_WARN, yMax:FLOW_WARN, borderColor:'rgba(226,75,74,0.55)', borderWidth:2, borderDash:[6,4], label:{ display:true, content:`High flow (${FLOW_WARN} L/min)`, position:'end', backgroundColor:'rgba(226,75,74,0.9)', color:'#fff', font:{size:10,weight:'bold'}, padding:4 } },
-          lowWarn:{ type:'line', yMin:FLOW_LOW, yMax:FLOW_LOW, borderColor:'rgba(239,159,39,0.55)', borderWidth:2, borderDash:[6,4], label:{ display:true, content:`Low / stall (${FLOW_LOW} L/min)`, position:'start', backgroundColor:'rgba(239,159,39,0.9)', color:'#fff', font:{size:10,weight:'bold'}, padding:4 } }
-        }}
-      },
-      scales:{
-        x:{ ticks:{font:{size:11},color:isDark?'#888780':'#999'}, grid:{display:false} },
-        y:{ min:0, max:FLOW_MAX+10, ticks:{font:{size:11},color:isDark?'#888780':'#999', callback:v=>v+' L/m'}, grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)',borderDash:[4,4]} }
+
+  if (flowChart) {
+    flowChart.data.labels = labels;
+    flowChart.data.datasets = datasets;
+    flowChart.update('none');
+  } else {
+    flowChart = new Chart(document.getElementById('flowChart'), {
+      type:'line', data:{ labels, datasets },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ 
+          legend:{ labels:{ color:isDark?'#b4b2a9':'#5f5e5a' } },
+          zoom: zoomConfig
+        },
+        scales:{
+          x:{ ticks:{color:isDark?'#888':'#999'} },
+          y:{ min:0, max:120, ticks:{color:isDark?'#888':'#999'} }
+        }
       }
-    }
-  });
+    });
+  }
 }
 
-// ── FETCH / SIM ──────────────────────────────────────
-async function simulateFetch() {
-  document.getElementById('last-update').textContent = 'Fetching…';
 
-  const tempData = BEACONS.map((b,i) => {
-    const last = tempHistory[i].length ? tempHistory[i][tempHistory[i].length-1] : null;
-    const tempC = last !== null ? Math.max(20, Math.min(45, last + (Math.random()-0.45)*3)) : 20 + Math.random()*25;
-    return { ...b, tempC };
-  });
-  tempData.forEach((d,i) => tempHistory[i].push(d.tempC));
-  renderTempCards(tempData);
-  renderTempHeatmap();
-  renderTempChart();
+// --- DATA SIMULATION LOOP ---
+function simulateFetch() {
+  document.getElementById('last-update').textContent = 'Live • ' + new Date().toLocaleTimeString();
 
-  const flowData = FLOW_METERS.map((fm,i) => {
-    const last = flowHistory[i].length ? flowHistory[i][flowHistory[i].length-1] : null;
-    const flow = last !== null ? Math.max(0, Math.min(FLOW_MAX, last + (Math.random()-0.45)*8)) : 30 + Math.random()*40;
-    return { ...fm, flow };
+  // 1. Sim Fire Systems
+  const fireData = FIRE_ZONES.map((z, i) => {
+    const lastSmoke = fireHistory[i].length ? fireHistory[i][fireHistory[i].length-1] : 2;
+    let smoke = Math.max(0, Math.min(100, lastSmoke + (Math.random() - 0.45) * 3));
+    
+    // Rare random spike
+    if (Math.random() > 0.97) smoke = 20 + Math.random() * 10; 
+
+    return {
+      ...z,
+      smokeLevel: smoke,
+      pressure: Math.round(115 + Math.random() * 10),
+      valveOpen: smoke > 15
+    };
   });
-  flowData.forEach((d,i) => flowHistory[i].push(d.flow));
+  fireData.forEach((d, i) => {
+    fireHistory[i].push(d.smokeLevel);
+    if(fireHistory[i].length > 50) fireHistory[i].shift(); // Store more data for zooming
+  });
+  renderFireCards(fireData);
+  renderFireChart();
+
+  // 2. Sim Motor Systems
+  const motorData = MOTORS.map((m, i) => {
+    const lastRpm = motorHistory[i].length ? motorHistory[i][motorHistory[i].length-1] : 1450;
+    const rpm = Math.max(0, Math.min(1800, lastRpm + (Math.random() - 0.45) * 50));
+    return {
+      ...m,
+      rpm: rpm,
+      temp: 40 + (rpm / 1800) * 40 + Math.random() * 5, 
+      vibration: 1.2 + (rpm / 1800) * 2 + Math.random()
+    };
+  });
+  motorData.forEach((d, i) => {
+    motorHistory[i].push(d.rpm);
+    if(motorHistory[i].length > 50) motorHistory[i].shift();
+  });
+  renderMotorCards(motorData);
+  renderMotorChart();
+
+  // 3. Sim Flow Meters + Totalizer Math
+  const flowData = FLOW_METERS.map((fm, i) => {
+    const lastFlow = flowHistory[i].length ? flowHistory[i][flowHistory[i].length-1] : 45;
+    const flow = Math.max(0, Math.min(120, lastFlow + (Math.random() - 0.45) * 12));
+    
+    const addedVolume = flow * (INTERVAL_MS / 1000 / 60);
+    fm.totalizer += addedVolume;
+
+    return { ...fm, flow: flow };
+  });
+  flowData.forEach((d, i) => {
+    flowHistory[i].push(d.flow);
+    if(flowHistory[i].length > 50) flowHistory[i].shift();
+  });
   renderFlowCards(flowData);
-  renderFlowHeatmap();
   renderFlowChart();
-
-  document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString();
 }
 
-function setUnit(u, btn) {
-  unit = u;
-  document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  simulateFetch();
-}
-
-buildLegend('legend-bar', heatColor);
-buildLegend('flow-legend-bar', flowHeatColor);
+// Start simulation
 simulateFetch();
-setInterval(simulateFetch, 10000);
+setInterval(simulateFetch, INTERVAL_MS);
+
 </script>
+</body>
+</html>
