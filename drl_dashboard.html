@@ -1,125 +1,57 @@
-<!--drl_dashboard.html-->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DRL Operations Dashboard — CLS Tech AI</title>
-  <style>
-    /* ── AUTH GUARD — runs before anything renders ── */
-  </style>
-  <script>
-    // ════════════════════════════════════════════════
-    //  AUTH GUARD — Runs immediately, blocks render
-    //  if session is not valid, redirect to login.
-    // ════════════════════════════════════════════════
-    (function() {
-      const SESSION_KEY = 'cls_drl_auth';
-      const SESSION_TOKEN = 'drl_auth_granted_2025';
-      if (sessionStorage.getItem(SESSION_KEY) !== SESSION_TOKEN) {
-        window.location.replace('drl-login.html');
-      }
-    })();
-  </script>
-</head>
-<body>
-
-<!-- TOP BAR for dashboard — logout + branding -->
-<div style="
-  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  height: 48px;
-  background: rgba(5,13,31,0.97);
-  border-bottom: 1px solid #1a2d52;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 1.5rem;
-  font-family: system-ui, sans-serif;
-">
-  <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;font-weight:600;color:#f0f6ff;">
-    <span style="color:#00d4ff;">CLS</span>&nbsp;TECH AI
-    <span style="color:#1a2d52;margin:0 4px;">|</span>
-    <span style="color:#7a93b8;font-weight:400;">Dr. Reddy's Laboratories — Operations</span>
-  </div>
-  <button onclick="logout()" style="
-    background: rgba(226,75,74,0.12); border: 1px solid rgba(226,75,74,0.3);
-    color: #e24b4a; font-size: 0.75rem; font-weight: 600;
-    padding: 0.3rem 0.85rem; border-radius: 6px; cursor: pointer;
-    letter-spacing: 0.04em; transition: background 0.2s;
-  " onmouseover="this.style.background='rgba(226,75,74,0.22)'"
-     onmouseout="this.style.background='rgba(226,75,74,0.12)'">
-    Sign Out
-  </button>
-</div>
-
-<div style="padding-top: 48px;">
-
-<!-- ══════════════════════════════════════════════════════
-     ORIGINAL DASHBOARD CODE BELOW (unchanged)
-══════════════════════════════════════════════════════ -->
 
 <style>
-  .dash { padding: 1rem 0; font-family: var(--font-sans, system-ui, -apple-system, sans-serif); }
-  .section-label { font-size: 13px; color: var(--color-text-secondary, #666); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
-  .sr-only { position: absolute; left: -9999px; }
-
-  .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
-  .ctrl-btn { font-size: 13px; font-weight: 500; padding: 6px 14px; cursor: pointer; border: 0.5px solid var(--color-border-secondary, #ccc); border-radius: var(--border-radius-md, 8px); background: transparent; color: var(--color-text-primary, #333); transition: all 0.15s ease; }
-  .ctrl-btn:hover { background: var(--color-background-secondary, #f0f0f0); }
-  .ctrl-btn.active { background: var(--color-text-primary, #333); color: #fff; border-color: var(--color-text-primary, #333); }
-  .ctrl-btn.zoom-reset { border-color: #378ADD; color: #378ADD; display: none; }
-  .ctrl-btn.zoom-reset.visible { display: inline-flex; align-items: center; gap: 5px; }
-  .last-update { font-size: 12px; color: var(--color-text-tertiary, #888); margin-left: auto; font-style: italic; }
-
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 2rem; }
-  .card { background: var(--color-background-primary, #fff); border: 0.5px solid var(--color-border-tertiary, #eaeaea); border-radius: var(--border-radius-lg, 12px); padding: 14px 18px; position: relative; transition: transform 0.2s ease; display: flex; flex-direction: column; }
-  .card:hover { transform: translateY(-2px); }
-  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 0.5px solid var(--color-border-tertiary, #f0f0f0); padding-bottom: 8px; }
-  .beacon-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary, #111); margin: 0; }
-  .beacon-id { font-size: 10px; color: var(--color-text-tertiary, #666); background: var(--color-background-secondary, #f4f4f5); padding: 3px 6px; border-radius: 4px; margin: 0; }
-  .temp-wrapper { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
-  .temp-value { font-size: 32px; font-weight: 500; margin: 0; line-height: 1; letter-spacing: -0.02em; }
-  .temp-unit { font-size: 12px; color: var(--color-text-secondary, #666); }
-  .status-row { display: flex; align-items: center; font-size: 12px; color: var(--color-text-secondary, #666); margin-top: auto; padding-top: 10px; border-top: 0.5px dashed var(--color-border-tertiary, #eaeaea); }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-  .trend { margin-left: auto; font-size: 12px; font-weight: 500; background: var(--color-background-secondary, #f8f9fa); padding: 2px 6px; border-radius: 6px; }
-
-  .heatmap-wrap { background: var(--color-background-primary, #fff); border: 0.5px solid var(--color-border-tertiary, #eaeaea); border-radius: var(--border-radius-lg, 12px); padding: 16px; margin-bottom: 2rem; }
-  .heatmap-grid { display: grid; grid-template-columns: 64px repeat(12, 1fr); gap: 4px; align-items: center; }
-  .hm-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary, #555); text-align: right; padding-right: 12px; }
-  .hm-time { font-size: 10px; color: var(--color-text-tertiary, #888); text-align: center; margin-bottom: 4px; }
-  .hm-cell { height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; cursor: default; transition: transform 0.15s; }
-  .hm-cell:hover { transform: scale(1.06); z-index: 10; }
-  .legend { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--color-text-secondary, #666); }
-  .legend-bar { display: flex; gap: 2px; }
-  .legend-swatch { width: 18px; height: 10px; border-radius: 2px; }
-
-  .chart-wrap { background: var(--color-background-primary, #fff); border: 0.5px solid var(--color-border-tertiary, #eaeaea); border-radius: var(--border-radius-lg, 12px); padding: 16px; }
-
-  .zoom-hint { font-size: 12px; color: var(--color-text-tertiary, #999); display: flex; align-items: center; gap: 6px; margin-top: 10px; }
-  .zoom-badge { background: var(--color-background-secondary, #f0f0f0); border: 0.5px solid var(--color-border-tertiary, #ddd); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 500; color: var(--color-text-secondary); }
-
-  .zoomed-indicator { display: none; align-items: center; gap: 6px; font-size: 12px; color: #185FA5; background: #E6F1FB; border: 0.5px solid #B5D4F4; border-radius: 6px; padding: 4px 10px; margin-bottom: 10px; }
-  .zoomed-indicator.visible { display: flex; }
+  .dash { padding: 1rem 0; font-family: var(--font-sans, system-ui, sans-serif); }
+  .section-label { font-size: 13px; color: var(--color-text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
+  .sr-only { position:absolute;left:-9999px; }
+  .controls { display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap; }
+  .ctrl-btn { font-size:13px;font-weight:500;padding:6px 14px;cursor:pointer;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);transition:all .15s; }
+  .ctrl-btn:hover { background:var(--color-background-secondary); }
+  .ctrl-btn.active { background:var(--color-text-primary);color:#fff;border-color:var(--color-text-primary); }
+  .last-update { font-size:12px;color:var(--color-text-tertiary);margin-left:auto;font-style:italic; }
+  .cards { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:2rem; }
+  .card { background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 18px;position:relative;transition:transform .2s;display:flex;flex-direction:column; }
+  .card:hover { transform:translateY(-2px); }
+  .card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:8px; }
+  .beacon-name { font-size:14px;font-weight:500;color:var(--color-text-primary);margin:0; }
+  .beacon-id { font-size:10px;color:var(--color-text-tertiary);background:var(--color-background-secondary);padding:3px 6px;border-radius:4px;margin:0; }
+  .val-wrapper { display:flex;align-items:baseline;gap:6px;margin-bottom:10px; }
+  .val-value { font-size:32px;font-weight:500;margin:0;line-height:1;letter-spacing:-0.02em; }
+  .val-unit { font-size:12px;color:var(--color-text-secondary); }
+  .status-row { display:flex;align-items:center;font-size:12px;color:var(--color-text-secondary);margin-top:auto;padding-top:10px;border-top:0.5px dashed var(--color-border-tertiary); }
+  .status-dot { width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px; }
+  .trend { margin-left:auto;font-size:12px;font-weight:500;background:var(--color-background-secondary);padding:2px 6px;border-radius:6px; }
+  .heatmap-wrap { background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:2rem; }
+  .heatmap-grid { display:grid;grid-template-columns:64px repeat(12,1fr);gap:4px;align-items:center; }
+  .hm-label { font-size:12px;font-weight:500;color:var(--color-text-secondary);text-align:right;padding-right:12px; }
+  .hm-time { font-size:10px;color:var(--color-text-tertiary);text-align:center;margin-bottom:4px; }
+  .hm-cell { height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:default;transition:transform .15s; }
+  .hm-cell:hover { transform:scale(1.06);z-index:10; }
+  .legend { display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--color-text-secondary); }
+  .legend-bar { display:flex;gap:2px; }
+  .legend-swatch { width:18px;height:10px;border-radius:2px; }
+  .chart-wrap { background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:2rem; }
+  .divider { border:none;border-top:0.5px solid var(--color-border-tertiary);margin:2rem 0; }
+  .section-block-title { font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px; }
+  .section-block-sub { font-size:12px;color:var(--color-text-tertiary);margin:0 0 1.25rem; }
 </style>
 
-<div class="dash" style="padding: 1rem 1.5rem;">
-  <h2 class="sr-only">BLE Beacon Temperature Dashboard with drag-to-zoom trend chart</h2>
+<div class="dash" style="padding:1rem 1.5rem;">
+  <h2 class="sr-only">DRL Operations Dashboard — Temperature and Flow Monitoring</h2>
 
   <div class="controls">
-    <span style="font-size:14px; font-weight:500; color:var(--color-text-primary);">
-      BLE Beacon Monitor
-    </span>
-    <div style="width:1px; height:20px; background:var(--color-border-tertiary); margin:0 6px;"></div>
+    <span style="font-size:14px;font-weight:500;color:var(--color-text-primary);">BLE Beacon Monitor</span>
+    <div style="width:1px;height:20px;background:var(--color-border-tertiary);margin:0 6px;"></div>
     <button class="ctrl-btn active" onclick="setUnit('C',this)">°C</button>
     <button class="ctrl-btn" onclick="setUnit('F',this)">°F</button>
     <button class="ctrl-btn" style="margin-left:4px" onclick="simulateFetch()">↻ Refresh</button>
-    <button class="ctrl-btn zoom-reset" id="resetBtn" onclick="resetZoom()">✕ Reset zoom</button>
     <span class="last-update" id="last-update">Connecting…</span>
   </div>
 
-  <p class="section-label">Live readings</p>
+  <!-- ── TEMPERATURE ── -->
+  <p class="section-label">Temperature — live readings</p>
   <div class="cards" id="cards"></div>
 
-  <p class="section-label">Heat map — last 12 readings</p>
+  <p class="section-label">Temperature — heat map (last 12)</p>
   <div class="heatmap-wrap">
     <div class="heatmap-grid" id="heatmap"></div>
     <div class="legend">
@@ -129,28 +61,39 @@
     </div>
   </div>
 
-  <p class="section-label">Trend — drag to zoom</p>
+  <p class="section-label">Temperature — trend</p>
   <div class="chart-wrap">
-    <div class="zoomed-indicator" id="zoomedIndicator">
-      Zoomed in — drag again to refine, or reset zoom to see all data
+    <div style="position:relative;width:100%;height:240px;">
+      <canvas id="trendChart"></canvas>
     </div>
-    <div style="position:relative; width:100%; height:260px;">
-      <canvas id="trendChart" role="img" aria-label="Temperature trend for 5 beacons over last 12 readings"></canvas>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── FLOW METERS ── -->
+  <p class="section-label">Flow meters — live readings</p>
+  <div class="cards" id="flow-cards"></div>
+
+  <p class="section-label">Flow meters — heat map (last 12)</p>
+  <div class="heatmap-wrap">
+    <div class="heatmap-grid" id="flow-heatmap"></div>
+    <div class="legend">
+      <span>Low</span>
+      <div class="legend-bar" id="flow-legend-bar"></div>
+      <span>High</span>
     </div>
-    <div class="zoom-hint">
-      <span class="zoom-badge">Click + drag</span> on the chart to zoom into any time range &nbsp;·&nbsp;
-      <span class="zoom-badge">Scroll</span> to zoom in/out &nbsp;·&nbsp;
-      <span class="zoom-badge">Double-click</span> to reset
+  </div>
+
+  <p class="section-label">Flow meters — trend</p>
+  <div class="chart-wrap">
+    <div style="position:relative;width:100%;height:220px;">
+      <canvas id="flowChart"></canvas>
     </div>
   </div>
 </div>
 
-</div><!-- end padding-top wrapper -->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 
 <script>
 const BEACONS = [
@@ -161,14 +104,29 @@ const BEACONS = [
   { id:'B-005', name:'Zone E', mac:'AA:BB:CC:05' },
 ];
 
-const COLORS = ['#378ADD','#1D9E75','#EF9F27','#D4537E','#7F77DD'];
+const FLOW_METERS = [
+  { id:'ETp-1', name:'ETp-1', mac:'FM:01', label:'Effluent Transfer — Line 1' },
+  { id:'ETp-2', name:'ETp-2', mac:'FM:02', label:'Effluent Transfer — Line 2' },
+];
+
+const TEMP_COLORS  = ['#378ADD','#1D9E75','#EF9F27','#D4537E','#7F77DD'];
+const FLOW_COLORS  = ['#0FA3B1','#E76F51'];
+
+const FLOW_UNIT    = 'L/min';
+const FLOW_MIN     = 0;
+const FLOW_MAX     = 120;
+const FLOW_WARN    = 90;   // high-flow threshold
+const FLOW_LOW     = 10;   // low-flow / stall threshold
+
 let unit = 'C';
-let history = BEACONS.map(() => []);
-let trendChart = null;
-let isZoomed = false;
+let tempHistory = BEACONS.map(() => []);
+let flowHistory = FLOW_METERS.map(() => []);
+let trendChart  = null;
+let flowChart   = null;
 
 function toUnit(c) { return unit === 'C' ? c : c * 9/5 + 32; }
 function fmtTemp(c) { return toUnit(c).toFixed(1) + '°' + unit; }
+function fmtFlow(v) { return v.toFixed(1) + ' ' + FLOW_UNIT; }
 
 function heatColor(norm) {
   const stops = [[59,130,246],[34,197,94],[250,204,21],[249,115,22],[239,68,68]];
@@ -177,29 +135,46 @@ function heatColor(norm) {
   const lo = stops[Math.floor(idx)], hi = stops[Math.ceil(idx)];
   const t = idx - Math.floor(idx);
   const r = Math.round(lo[0]+(hi[0]-lo[0])*t), g = Math.round(lo[1]+(hi[1]-lo[1])*t), b = Math.round(lo[2]+(hi[2]-lo[2])*t);
-  return { bg:`rgb(${r},${g},${b})`, text: n>0.6||n<0.2?'#fff':'#1a1a1a' };
+  return { bg:`rgb(${r},${g},${b})`, text: n>0.6||n<0.2 ? '#fff' : '#1a1a1a' };
 }
 
-function buildLegend() {
-  const bar = document.getElementById('legend-bar');
+function flowHeatColor(norm) {
+  const stops = [[219,234,254],[147,197,253],[59,130,246],[29,78,216],[30,27,75]];
+  const n = Math.max(0, Math.min(1, norm));
+  const idx = n * (stops.length - 1);
+  const lo = stops[Math.floor(idx)], hi = stops[Math.ceil(idx)];
+  const t = idx - Math.floor(idx);
+  const r = Math.round(lo[0]+(hi[0]-lo[0])*t), g = Math.round(lo[1]+(hi[1]-lo[1])*t), b = Math.round(lo[2]+(hi[2]-lo[2])*t);
+  return { bg:`rgb(${r},${g},${b})`, text: n>0.55 ? '#fff' : '#1a1a1a' };
+}
+
+function buildLegend(id, colorFn) {
+  const bar = document.getElementById(id);
   bar.innerHTML = '';
-  for (let i=0;i<=10;i++) {
-    const c = heatColor(i/10);
+  for (let i = 0; i <= 10; i++) {
+    const c = colorFn(i / 10);
     const s = document.createElement('div');
-    s.className = 'legend-swatch';
-    s.style.background = c.bg;
+    s.className = 'legend-swatch'; s.style.background = c.bg;
     bar.appendChild(s);
   }
 }
 
-function renderCards(data) {
+function getTimeLabels(n, intervalMs) {
+  return Array.from({length:n}, (_,i) => {
+    const d = new Date(Date.now() - (n-1-i) * intervalMs);
+    return d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+  });
+}
+
+// ── TEMPERATURE ──────────────────────────────────────
+function renderTempCards(data) {
   const wrap = document.getElementById('cards');
   wrap.innerHTML = '';
   data.forEach((d,i) => {
-    const prev = history[i].length>=2 ? history[i][history[i].length-2] : d.tempC;
+    const prev = tempHistory[i].length >= 2 ? tempHistory[i][tempHistory[i].length-2] : d.tempC;
     const delta = d.tempC - prev;
-    const trend = Math.abs(delta)<0.3 ? '→' : delta>0 ? '↑' : '↓';
-    const trendCol = Math.abs(delta)<0.3 ? 'var(--color-text-secondary)' : delta>0 ? '#EF9F27' : '#378ADD';
+    const trend = Math.abs(delta) < 0.3 ? '→' : delta > 0 ? '↑' : '↓';
+    const trendCol = Math.abs(delta) < 0.3 ? 'var(--color-text-secondary)' : delta > 0 ? '#EF9F27' : '#378ADD';
     const ok = d.tempC < 38;
     const div = document.createElement('div');
     div.className = 'card';
@@ -208,192 +183,199 @@ function renderCards(data) {
         <span class="beacon-name">${d.name}</span>
         <span class="beacon-id">${d.mac}</span>
       </div>
-      <div class="temp-wrapper">
-        <span class="temp-value" style="color:${COLORS[i]}">${fmtTemp(d.tempC)}</span>
-        <span class="temp-unit">${unit==='C'?'Celsius':'Fahrenheit'}</span>
+      <div class="val-wrapper">
+        <span class="val-value" style="color:${TEMP_COLORS[i]}">${fmtTemp(d.tempC)}</span>
+        <span class="val-unit">${unit==='C'?'Celsius':'Fahrenheit'}</span>
       </div>
       <div class="status-row">
         <span class="status-dot" style="background:${ok?'#1D9E75':'#E24B4A'}"></span>
-        <span style="color:${ok?'var(--color-text-secondary)':'#E24B4A'}; font-weight:${ok?'400':'500'}">${ok?'Normal':'High temp'}</span>
+        <span style="color:${ok?'var(--color-text-secondary)':'#E24B4A'};font-weight:${ok?'400':'500'}">${ok?'Normal':'High temp'}</span>
         <span class="trend" style="color:${trendCol}">${trend} ${Math.abs(toUnit(d.tempC)-toUnit(prev)).toFixed(1)}°</span>
       </div>`;
     wrap.appendChild(div);
   });
 }
 
-function renderHeatmap() {
+function renderTempHeatmap() {
   const wrap = document.getElementById('heatmap');
   wrap.innerHTML = '';
-  const times = Array.from({length:12},(_,i)=>{
-    const d = new Date(Date.now()-(11-i)*30000);
-    return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-  });
+  const times = getTimeLabels(12, 30000);
   wrap.appendChild(document.createElement('div'));
   times.forEach(t => {
-    const el = document.createElement('div');
-    el.className = 'hm-time'; el.textContent = t; wrap.appendChild(el);
+    const el = document.createElement('div'); el.className = 'hm-time'; el.textContent = t; wrap.appendChild(el);
   });
   BEACONS.forEach((b,bi) => {
-    const lbl = document.createElement('div');
-    lbl.className = 'hm-label'; lbl.textContent = b.name; wrap.appendChild(lbl);
-    const row = history[bi].slice(-12);
-    while (row.length<12) row.unshift(null);
+    const lbl = document.createElement('div'); lbl.className = 'hm-label'; lbl.textContent = b.name; wrap.appendChild(lbl);
+    const row = tempHistory[bi].slice(-12);
+    while (row.length < 12) row.unshift(null);
     row.forEach(v => {
-      const cell = document.createElement('div');
-      cell.className = 'hm-cell';
-      if (v!==null) {
+      const cell = document.createElement('div'); cell.className = 'hm-cell';
+      if (v !== null) {
         const {bg,text} = heatColor((v-20)/25);
         cell.style.background = bg; cell.style.color = text;
         cell.textContent = Math.round(toUnit(v));
         cell.title = `${b.name}: ${fmtTemp(v)}`;
-      } else {
-        cell.style.background = 'var(--color-background-secondary)';
-      }
+      } else { cell.style.background = 'var(--color-background-secondary)'; }
       wrap.appendChild(cell);
     });
   });
 }
 
-function updateZoomUI() {
-  document.getElementById('resetBtn').classList.toggle('visible', isZoomed);
-  document.getElementById('zoomedIndicator').classList.toggle('visible', isZoomed);
-}
-
-function resetZoom() {
-  if (trendChart) {
-    trendChart.resetZoom();
-    isZoomed = false;
-    updateZoomUI();
-  }
-}
-
-function renderChart() {
-  const labels = Array.from({length:12},(_,i)=>{
-    const d = new Date(Date.now()-(11-i)*30000);
-    return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-  });
+function renderTempChart() {
+  const labels = getTimeLabels(12, 30000);
   const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
   const threshVal = parseFloat(toUnit(38).toFixed(1));
-
-  const datasets = BEACONS.map((b,i)=>({
+  const datasets = BEACONS.map((b,i) => ({
     label: b.name,
-    data: history[i].slice(-12).map(v=>parseFloat(toUnit(v).toFixed(1))),
-    borderColor: COLORS[i],
-    backgroundColor: COLORS[i]+'18',
-    borderWidth: 2,
-    pointRadius: 4,
-    pointHoverRadius: 7,
-    tension: 0.4,
-    fill: false,
+    data: tempHistory[i].slice(-12).map(v => parseFloat(toUnit(v).toFixed(1))),
+    borderColor: TEMP_COLORS[i], backgroundColor: TEMP_COLORS[i]+'18',
+    borderWidth:2, pointRadius:4, pointHoverRadius:7, tension:0.4, fill:false,
   }));
-
-  if (trendChart) { trendChart.destroy(); }
-
+  if (trendChart) trendChart.destroy();
   trendChart = new Chart(document.getElementById('trendChart'), {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode:'index', intersect:false },
-      plugins: {
-        legend: {
-          display: true, position:'top',
-          labels: { usePointStyle:true, boxWidth:8, font:{size:12}, color:isDark?'#b4b2a9':'#5f5e5a' }
-        },
-        tooltip: {
-          backgroundColor: isDark?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.95)',
-          titleColor: isDark?'#fff':'#111',
-          bodyColor: isDark?'#ccc':'#444',
-          borderColor: isDark?'#333':'#eee',
-          borderWidth: 1, padding:10, boxPadding:4, usePointStyle:true
-        },
-        annotation: {
-          annotations: {
-            dangerZone: {
-              type:'line', yMin:threshVal, yMax:threshVal,
-              borderColor:'rgba(226,75,74,0.55)', borderWidth:2, borderDash:[6,4],
-              label: {
-                display:true,
-                content:`High temp (${threshVal.toFixed(0)}°${unit})`,
-                position:'end',
-                backgroundColor:'rgba(226,75,74,0.9)', color:'#fff',
-                font:{size:10,weight:'bold'}, padding:4
-              }
-            }
-          }
-        },
-        zoom: {
-          zoom: {
-            drag: {
-              enabled: true,
-              backgroundColor: 'rgba(55,138,221,0.12)',
-              borderColor: '#378ADD',
-              borderWidth: 1.5,
-              threshold: 10,
-            },
-            wheel: { enabled: true, speed: 0.1 },
-            pinch: { enabled: true },
-            mode: 'x',
-            onZoom() {
-              isZoomed = true;
-              updateZoomUI();
-            }
-          },
-          pan: {
-            enabled: true,
-            mode: 'x',
-            modifierKey: 'shift',
-          },
-          limits: {
-            x: { minRange: 1 }
-          }
-        }
+    type:'line', data:{ labels, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:true, position:'top', labels:{ usePointStyle:true, boxWidth:8, font:{size:12}, color:isDark?'#b4b2a9':'#5f5e5a' } },
+        tooltip:{ backgroundColor:isDark?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.95)', titleColor:isDark?'#fff':'#111', bodyColor:isDark?'#ccc':'#444', borderColor:isDark?'#333':'#eee', borderWidth:1, padding:10, usePointStyle:true },
+        annotation:{ annotations:{ dangerZone:{ type:'line', yMin:threshVal, yMax:threshVal, borderColor:'rgba(226,75,74,0.55)', borderWidth:2, borderDash:[6,4], label:{ display:true, content:`High temp (${threshVal.toFixed(0)}°${unit})`, position:'end', backgroundColor:'rgba(226,75,74,0.9)', color:'#fff', font:{size:10,weight:'bold'}, padding:4 } } } }
       },
-      scales: {
-        x: { ticks:{font:{size:11}, color:isDark?'#888780':'#999'}, grid:{display:false} },
-        y: { ticks:{font:{size:11}, color:isDark?'#888780':'#999', callback:v=>v+'°'}, grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)', borderDash:[4,4]} }
+      scales:{
+        x:{ ticks:{font:{size:11},color:isDark?'#888780':'#999'}, grid:{display:false} },
+        y:{ ticks:{font:{size:11},color:isDark?'#888780':'#999', callback:v=>v+'°'}, grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)',borderDash:[4,4]} }
       }
     }
   });
-
-  const canvas = document.getElementById('trendChart');
-  canvas.addEventListener('dblclick', resetZoom);
 }
 
+// ── FLOW METERS ──────────────────────────────────────
+function renderFlowCards(data) {
+  const wrap = document.getElementById('flow-cards');
+  wrap.innerHTML = '';
+  data.forEach((d,i) => {
+    const prev = flowHistory[i].length >= 2 ? flowHistory[i][flowHistory[i].length-2] : d.flow;
+    const delta = d.flow - prev;
+    const trend = Math.abs(delta) < 0.5 ? '→' : delta > 0 ? '↑' : '↓';
+    const trendCol = Math.abs(delta) < 0.5 ? 'var(--color-text-secondary)' : delta > 0 ? '#EF9F27' : '#378ADD';
+    const isHigh = d.flow > FLOW_WARN;
+    const isLow  = d.flow < FLOW_LOW;
+    const statusOk = !isHigh && !isLow;
+    const statusText = isHigh ? 'High flow' : isLow ? 'Low / stall' : 'Normal';
+    const statusColor = isHigh ? '#E24B4A' : isLow ? '#EF9F27' : '#1D9E75';
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <div class="card-header">
+        <span class="beacon-name">${d.name}</span>
+        <span class="beacon-id">${d.id}</span>
+      </div>
+      <div class="val-wrapper">
+        <span class="val-value" style="color:${FLOW_COLORS[i]}">${fmtFlow(d.flow)}</span>
+      </div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;">${d.label}</div>
+      <div class="status-row">
+        <span class="status-dot" style="background:${statusColor}"></span>
+        <span style="color:${statusColor};font-weight:${statusOk?'400':'500'}">${statusText}</span>
+        <span class="trend" style="color:${trendCol}">${trend} ${Math.abs(d.flow - prev).toFixed(1)} L/min</span>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function renderFlowHeatmap() {
+  const wrap = document.getElementById('flow-heatmap');
+  wrap.innerHTML = '';
+  const times = getTimeLabels(12, 30000);
+  wrap.appendChild(document.createElement('div'));
+  times.forEach(t => {
+    const el = document.createElement('div'); el.className = 'hm-time'; el.textContent = t; wrap.appendChild(el);
+  });
+  FLOW_METERS.forEach((fm,fi) => {
+    const lbl = document.createElement('div'); lbl.className = 'hm-label'; lbl.textContent = fm.id; wrap.appendChild(lbl);
+    const row = flowHistory[fi].slice(-12);
+    while (row.length < 12) row.unshift(null);
+    row.forEach(v => {
+      const cell = document.createElement('div'); cell.className = 'hm-cell';
+      if (v !== null) {
+        const {bg,text} = flowHeatColor((v - FLOW_MIN) / (FLOW_MAX - FLOW_MIN));
+        cell.style.background = bg; cell.style.color = text;
+        cell.textContent = Math.round(v);
+        cell.title = `${fm.id}: ${fmtFlow(v)}`;
+      } else { cell.style.background = 'var(--color-background-secondary)'; }
+      wrap.appendChild(cell);
+    });
+  });
+}
+
+function renderFlowChart() {
+  const labels = getTimeLabels(12, 30000);
+  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const datasets = FLOW_METERS.map((fm,i) => ({
+    label: fm.id,
+    data: flowHistory[i].slice(-12).map(v => parseFloat(v.toFixed(1))),
+    borderColor: FLOW_COLORS[i], backgroundColor: FLOW_COLORS[i]+'18',
+    borderWidth:2, pointRadius:4, pointHoverRadius:7, tension:0.4, fill:false,
+  }));
+  if (flowChart) flowChart.destroy();
+  flowChart = new Chart(document.getElementById('flowChart'), {
+    type:'line', data:{ labels, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:true, position:'top', labels:{ usePointStyle:true, boxWidth:8, font:{size:12}, color:isDark?'#b4b2a9':'#5f5e5a' } },
+        tooltip:{ backgroundColor:isDark?'rgba(0,0,0,0.85)':'rgba(255,255,255,0.95)', titleColor:isDark?'#fff':'#111', bodyColor:isDark?'#ccc':'#444', borderColor:isDark?'#333':'#eee', borderWidth:1, padding:10, usePointStyle:true },
+        annotation:{ annotations:{
+          highWarn:{ type:'line', yMin:FLOW_WARN, yMax:FLOW_WARN, borderColor:'rgba(226,75,74,0.55)', borderWidth:2, borderDash:[6,4], label:{ display:true, content:`High flow (${FLOW_WARN} L/min)`, position:'end', backgroundColor:'rgba(226,75,74,0.9)', color:'#fff', font:{size:10,weight:'bold'}, padding:4 } },
+          lowWarn:{ type:'line', yMin:FLOW_LOW, yMax:FLOW_LOW, borderColor:'rgba(239,159,39,0.55)', borderWidth:2, borderDash:[6,4], label:{ display:true, content:`Low / stall (${FLOW_LOW} L/min)`, position:'start', backgroundColor:'rgba(239,159,39,0.9)', color:'#fff', font:{size:10,weight:'bold'}, padding:4 } }
+        }}
+      },
+      scales:{
+        x:{ ticks:{font:{size:11},color:isDark?'#888780':'#999'}, grid:{display:false} },
+        y:{ min:0, max:FLOW_MAX+10, ticks:{font:{size:11},color:isDark?'#888780':'#999', callback:v=>v+' L/m'}, grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)',borderDash:[4,4]} }
+      }
+    }
+  });
+}
+
+// ── FETCH / SIM ──────────────────────────────────────
 async function simulateFetch() {
   document.getElementById('last-update').textContent = 'Fetching…';
-  const data = BEACONS.map((b,i) => {
-    let nextTemp = history[i].length
-      ? Math.max(20, Math.min(45, history[i][history[i].length-1] + (Math.random()-0.45)*3))
-      : 20 + Math.random()*25;
-    return { ...b, tempC: nextTemp };
+
+  const tempData = BEACONS.map((b,i) => {
+    const last = tempHistory[i].length ? tempHistory[i][tempHistory[i].length-1] : null;
+    const tempC = last !== null ? Math.max(20, Math.min(45, last + (Math.random()-0.45)*3)) : 20 + Math.random()*25;
+    return { ...b, tempC };
   });
-  data.forEach((d,i) => history[i].push(d.tempC));
-  renderCards(data);
-  renderHeatmap();
-  renderChart();
-  if (isZoomed) updateZoomUI();
+  tempData.forEach((d,i) => tempHistory[i].push(d.tempC));
+  renderTempCards(tempData);
+  renderTempHeatmap();
+  renderTempChart();
+
+  const flowData = FLOW_METERS.map((fm,i) => {
+    const last = flowHistory[i].length ? flowHistory[i][flowHistory[i].length-1] : null;
+    const flow = last !== null ? Math.max(0, Math.min(FLOW_MAX, last + (Math.random()-0.45)*8)) : 30 + Math.random()*40;
+    return { ...fm, flow };
+  });
+  flowData.forEach((d,i) => flowHistory[i].push(d.flow));
+  renderFlowCards(flowData);
+  renderFlowHeatmap();
+  renderFlowChart();
+
   document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString();
 }
 
 function setUnit(u, btn) {
   unit = u;
-  document.querySelectorAll('.ctrl-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   simulateFetch();
 }
 
-// ── LOGOUT ──
-function logout() {
-  sessionStorage.removeItem('cls_drl_auth');
-  window.location.replace('drl-login.html');
-}
-
-buildLegend();
+buildLegend('legend-bar', heatColor);
+buildLegend('flow-legend-bar', flowHeatColor);
 simulateFetch();
 setInterval(simulateFetch, 10000);
 </script>
-
-</body>
-</html>
