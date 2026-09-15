@@ -1,405 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revolutionizing Industrial Peptide Manufacturing in India</title>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --background-color: #f9f9f9;
-            --text-color: #333;
-            --light-gray: #ecf0f1;
-            --border-color: #ddd;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--background-color);
-            padding: 0;
-            max-width: 100%;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            padding: 40px 0;
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            line-height: 1.3;
-        }
-        
-        h2 {
-            font-size: 1.8rem;
-            color: var(--primary-color);
-            margin: 30px 0 15px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--light-gray);
-        }
-        
-        h3 {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-            margin: 25px 0 15px 0;
-        }
-        
-        p {
-            margin-bottom: 20px;
-        }
-        
-        .subtitle {
-            font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .content {
-            padding: 20px 0;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-        }
-        
-        table thead tr {
-            background-color: var(--secondary-color);
-            color: white;
-            text-align: left;
-        }
-        
-        table th,
-        table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        table tbody tr {
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        table tbody tr:nth-of-type(even) {
-            background-color: var(--light-gray);
-        }
-        
-        table tbody tr:last-of-type {
-            border-bottom: 2px solid var(--secondary-color);
-        }
-        
-        ul {
-            margin: 20px 0 20px 20px;
-        }
-        
-        li {
-            margin-bottom: 10px;
-        }
-        
-        .highlight {
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-        
-        .contact {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: var(--light-gray);
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
-            
-            table {
-                font-size: 0.8rem;
-            }
-            
-            table th,
-            table td {
-                padding: 8px 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revolutionizing Industrial Peptide Manufacturing in India — CLS Tech AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #070c18;
+      --bg-surface: #0c1424;
+      --bg-card: rgba(13, 22, 38, 0.7);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(0, 212, 255, 0.4);
+      --cyan: #00d4ff;
+      --cyan-dim: rgba(0, 212, 255, 0.08);
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      line-height: 1.7;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    /* Ambient Background */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle 700px at 80% 15%, rgba(0, 212, 255, 0.05), transparent 70%),
+        radial-gradient(circle 600px at 20% 75%, rgba(0, 100, 220, 0.05), transparent 60%);
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 70px;
+      background: rgba(7, 12, 24, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1.25rem, 5vw, 4rem);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .nav-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-back-link {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--text-body);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.48rem 0.95rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .nav-back-link:hover {
+      color: var(--text-white);
+      border-color: var(--border-focus);
+      background: var(--cyan-dim);
+    }
+
+    /* MAIN CONTAINER */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 115px clamp(1.25rem, 4vw, 2.5rem) 5rem;
+    }
+
+    /* ARTICLE HEADER */
+    .article-header {
+      margin-bottom: 3rem;
+    }
+
+    .article-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      background: var(--cyan-dim);
+      border: 1px solid var(--border-focus);
+      padding: 0.35rem 0.85rem;
+      border-radius: 100px;
+      margin-bottom: 1.25rem;
+    }
+
+    .article-title {
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.85rem;
+    }
+
+    .article-subtitle {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--cyan);
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.8rem 0;
+      flex-wrap: wrap;
+    }
+
+    /* KPI STATS */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+      margin: 2.25rem 0 3rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      transition: var(--transition);
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-focus);
+    }
+
+    .kpi-num {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--cyan);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .kpi-label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--text-body);
+      margin-top: 0.2rem;
+    }
+
+    /* CONTENT TYPOGRAPHY */
+    .article-body h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin: 2.75rem 0 1rem;
+      color: var(--text-white);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.5rem;
+    }
+
+    .article-body p {
+      color: var(--text-body);
+      font-size: 0.98rem;
+      margin-bottom: 1.35rem;
+      line-height: 1.75;
+    }
+
+    .article-body ul {
+      margin: 1.25rem 0 1.75rem 1.5rem;
+      color: var(--text-body);
+    }
+
+    .article-body li {
+      margin-bottom: 0.65rem;
+      line-height: 1.65;
+    }
+
+    .highlight-badge {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    /* RESPONSIVE TABLE CONTAINERS */
+    .table-responsive-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 1.5rem 0 2.25rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    table thead th {
+      background: rgba(12, 20, 36, 0.9);
+      color: var(--cyan);
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--border-focus);
+      white-space: nowrap;
+    }
+
+    table tbody td {
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-body);
+    }
+
+    table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    table tbody tr.highlight-row {
+      background: rgba(0, 212, 255, 0.06);
+      font-weight: 600;
+    }
+    table tbody tr.highlight-row td {
+      color: var(--text-white);
+    }
+
+    /* CALLOUT BOX */
+    .callout-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      margin: 2.75rem 0;
+      text-align: center;
+    }
+
+    .callout-box h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 0.4rem;
+    }
+
+    .callout-box p {
+      color: var(--text-body);
+      font-size: 0.92rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .callout-box a.btn-cta-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--cyan);
+      color: #050d1a;
+      font-weight: 600;
+      padding: 0.7rem 1.6rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+    }
+
+    .callout-box a.btn-cta-email:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 16px var(--cyan-glow);
+    }
+
+    /* FOOTER */
+    footer {
+      background: #040810;
+      border-top: 1px solid var(--border-subtle);
+      padding: 2.5rem clamp(1.25rem, 5vw, 4rem);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Revolutionizing Industrial Peptide Manufacturing in India</h1>
-            <p class="subtitle">PeptiWave30: The world's First 30L Microwave-Assisted Synthesizer Advantage</p>
-        </div>
-    </header>
-    
-    <div class="container">
-        <div class="content">
-            <h2>Introduction</h2>
-            <p>Peptides like semaglutide have revolutionized treatment for diabetes and obesity, driving enormous global demand for scalable, cost-efficient manufacturing. India's pharma sector is a key player in supplying peptide APIs, but manufacturers face a crucial decision: continue with conventional solid-phase peptide synthesis (SPPS) or adopt advanced microwave-assisted peptide synthesizers.</p>
-            
-            <p>This blog compares three industrial peptide synthesis methods targeting 20 kg of crude semaglutide per batch using current 2025 cost data in Indian Rupees (₹ crores). The analysis proves that PeptiWave30 30L microwave-assisted peptide synthesizer offers the best balance of cost, throughput, automation, and sustainability.</p>
-            
-            <h2>1. Production Setup and Batch Planning</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>System Type</th>
-                        <th>Batches Needed</th>
-                        <th>Total Reactor Volume (L)</th>
-                        <th>Parallel Machines Needed</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Conventional SPPS (1,000L)</td>
-                        <td>1</td>
-                        <td>1,000</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>15L Microwave Synthesizers</td>
-                        <td>20</td>
-                        <td>300</td>
-                        <td>20</td>
-                    </tr>
-                    <tr>
-                        <td>30L Microwave Synthesizers (PeptiWave30)</td>
-                        <td>10</td>
-                        <td>300</td>
-                        <td>10</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <p>Microwave synthesizers provide higher crude peptide yields per liter, requiring fewer reactors and batches than conventional SPPS.</p>
-            
-            <h2>2. Capital Expenditure (CapEx)</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>System Type</th>
-                        <th>CapEx Range (₹ crores)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Conventional SPPS (1,000L)</td>
-                        <td>₹32.1 – ₹48.1</td>
-                    </tr>
-                    <tr>
-                        <td>15L Microwave Synthesizers (20 units)</td>
-                        <td>₹105.4 – ₹149.3</td>
-                    </tr>
-                    <tr>
-                        <td>30L Microwave Synthesizers (10 units)</td>
-                        <td>₹38.5 – ₹48.1</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <p>PeptiWave30 30L design requires fewer units and offers a capital cost comparable to conventional SPPS but far less than multiple smaller microwave units.</p>
-            
-            <h2>3. Operating Expenditure (OpEx) Including Hidden Costs</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Cost Type</th>
-                        <th>Conventional SPPS (₹ crores)</th>
-                        <th>15L Microwave Synthesizers (₹ crores)</th>
-                        <th>30L Microwave Synthesizers (₹ crores)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Direct Operating Cost</td>
-                        <td>44.3</td>
-                        <td>24.0</td>
-                        <td>14.1</td>
-                    </tr>
-                    <tr>
-                        <td>Runtime-Related Loss</td>
-                        <td>5.0</td>
-                        <td>1.7</td>
-                        <td>1.0</td>
-                    </tr>
-                    <tr>
-                        <td>Waste & Environmental Loss</td>
-                        <td>10.0</td>
-                        <td>3.3</td>
-                        <td>1.7</td>
-                    </tr>
-                    <tr>
-                        <td>Labor Costs</td>
-                        <td>6.7</td>
-                        <td>3.3</td>
-                        <td>2.0</td>
-                    </tr>
-                    <tr>
-                        <td>Automation & Upkeep</td>
-                        <td>0.7</td>
-                        <td>1.7</td>
-                        <td>2.7</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total OpEx (All Included)</strong></td>
-                        <td><strong>66.7</strong></td>
-                        <td><strong>34.0</strong></td>
-                        <td><strong>21.5</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <p>The 30L system achieves approximately 70% lower operating expenses versus conventional SPPS and roughly 37% lower than 15L microwaves, making it highly cost-effective.</p>
-            
-            <h2>4. Process Time, Labor, and Environmental Factors</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Parameter</th>
-                        <th>Conventional SPPS</th>
-                        <th>15L Microwave Synthesizer</th>
-                        <th>30L Microwave Synthesizer (PeptiWave30)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Time to Produce 20kg Batch</td>
-                        <td>7–10 days</td>
-                        <td>2 days (parallel)</td>
-                        <td>2 days (parallel)</td>
-                    </tr>
-                    <tr>
-                        <td>Waste & Environmental Impact</td>
-                        <td>Very High</td>
-                        <td>Moderate</td>
-                        <td>Lowest</td>
-                    </tr>
-                    <tr>
-                        <td>Labor Intensity</td>
-                        <td>High (large teams)</td>
-                        <td>Moderate</td>
-                        <td>Minimal (highly automated)</td>
-                    </tr>
-                    <tr>
-                        <td>Automation Level</td>
-                        <td>Low</td>
-                        <td>Moderate</td>
-                        <td>Very High</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <h2>5. Summary Table: Total Cost and Performance for 20kg Crude Peptide Batch</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>System Type</th>
-                        <th>CapEx (₹ crores)</th>
-                        <th>OpEx (₹ crores)</th>
-                        <th>Machines Needed</th>
-                        <th>Batch Time (Days)</th>
-                        <th>Environmental Impact</th>
-                        <th>Labor Cost</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Conventional SPPS (1,000L)</td>
-                        <td>32.1 – 48.1</td>
-                        <td>66.7</td>
-                        <td>1</td>
-                        <td>7–10</td>
-                        <td>Highest</td>
-                        <td>Highest</td>
-                    </tr>
-                    <tr>
-                        <td>15L Microwave Synthesizers (20 units)</td>
-                        <td>105.4 – 149.3</td>
-                        <td>34.0</td>
-                        <td>20</td>
-                        <td>2</td>
-                        <td>Moderate</td>
-                        <td>Moderate</td>
-                    </tr>
-                    <tr>
-                        <td>30L Microwave Synthesizers (10 units, PeptiWave 30)</td>
-                        <td>38.5 – 48.1</td>
-                        <td>21.5</td>
-                        <td>10</td>
-                        <td>2</td>
-                        <td>Lowest</td>
-                        <td>Lowest</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <h2>6. Why PeptiWave30 30L Microwave System is the Future</h2>
-            <ul>
-                <li><span class="highlight">Cost Advantage:</span> Combined capital and operating expenses are the lowest among options for large-scale peptide production.</li>
-                <li><span class="highlight">Process Efficiency:</span> Faster batch turnaround times enable more campaigns per month.</li>
-                <li><span class="highlight">Sustainability:</span> Significantly reduced solvent and waste volumes make the system regulatory and eco-friendly.</li>
-                <li><span class="highlight">Automation:</span> Highly automated operations cut labor needs and minimize human error.</li>
-                <li><span class="highlight">Scalability & Flexibility:</span> Modular expansion with fewer reactors simplifies maintenance and increases reliability.</li>
-                <li><span class="highlight">Quality:</span> Improved batch consistency and crude purity facilitate downstream purification.</li>
-            </ul>
-            
-            <h2>7. Final Thoughts</h2>
-            <p>India stands at the cusp of global leadership in peptide API production. PeptiWave30 innovative 30L microwave-assisted peptide synthesizer is technologically and economically poised to become the industry standard, offering unmatched efficiency, lower costs, faster delivery, and stronger compliance with environmental standards.</p>
-            
-            <p>Manufacturers adopting this technology will gain competitive advantages in a rapidly growing, lucrative global market for peptides like semaglutide.</p>
-            
-            <p>All numbers shown are based on validated 2025 industry data, vendor quotes, and current exchange rates. The blog aims to inform pharma manufacturing strategists, investors, and technologists about the best way forward in peptide synthesis.</p>
-            
-            <div class="contact">
-                <p>For more details contact: <a href="mailto:praveeenyvv@clstechai.com">praveeenyvv@clstechai.com</a></p>
-            </div>
-        </div>
+
+  <div class="bg-mesh"></div>
+  <div class="bg-grid"></div>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.jpg" alt="CLS Tech AI">
+      CLS TECH AI
+    </a>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-back-link">← Back to Website</a>
+      <a href="customer-login.html" class="nav-back-link">🔒 Client Portal</a>
     </div>
-    
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 PeptiWave30 | Revolutionizing Industrial Peptide Manufacturing</p>
-        </div>
-    </footer>
+  </nav>
+
+  <!-- MAIN ARTICLE -->
+  <main>
+    <div class="article-header">
+      <div class="article-badge">Pharma 4.0 · Technical Analysis</div>
+      <h1 class="article-title">Revolutionizing Industrial Peptide Manufacturing in India</h1>
+      <p class="article-subtitle">PeptiWave30: The World's First 30L Microwave-Assisted Synthesizer Advantage</p>
+      
+      <div class="article-meta">
+        <span>📅 Published 2025</span>
+        <span>⏱️ 6 Min Read</span>
+        <span>🏷️ Semaglutide & Peptide Synthesis</span>
+        <span>🏢 CLS Tech AI</span>
+      </div>
+    </div>
+
+    <!-- Quick Metric Cards -->
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-num">~70%</div>
+        <div class="kpi-label">OpEx Reduction</div>
+        <div class="kpi-sub">vs. Conventional 1,000L SPPS</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">2 Days</div>
+        <div class="kpi-label">Batch Cycle Time</div>
+        <div class="kpi-sub">vs. 7–10 days on legacy systems</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">10 Units</div>
+        <div class="kpi-label">Reactor Footprint</div>
+        <div class="kpi-sub">Halves parallel machine count</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">Lowest</div>
+        <div class="kpi-label">Solvent Waste</div>
+        <div class="kpi-sub">Strict green chemistry compliance</div>
+      </div>
+    </div>
+
+    <div class="article-body">
+      <h2>Introduction</h2>
+      <p>
+        Peptides like <strong>semaglutide</strong> have revolutionized therapies for diabetes and metabolic health, driving massive global demand for scalable, cost-efficient manufacturing. India's pharma sector is a key player in supplying peptide APIs, but manufacturers face a crucial decision: continue with conventional solid-phase peptide synthesis (SPPS) or adopt advanced microwave-assisted peptide synthesizers.
+      </p>
+      <p>
+        This analysis compares three industrial peptide synthesis methods targeting <strong>20 kg of crude semaglutide per batch</strong> using current 2025 cost data in Indian Rupees (₹ crores). The data demonstrates why the <strong>PeptiWave30 30L microwave-assisted peptide synthesizer</strong> offers the best balance of cost, throughput, automation, and sustainability.
+      </p>
+
+      <h2>1. Production Setup and Batch Planning</h2>
+      <p>
+        Microwave synthesizers provide higher crude peptide yields per liter, requiring fewer reactors and batches than conventional SPPS.
+      </p>
+
+      <div class="table-responsive-container">
+        <table>
+          <thead>
+            <tr>
+              <th>System Type</th>
+              <th>Batches Needed</th>
+              <th>Total Reactor Volume (L)</th>
+              <th>Parallel Machines Needed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Conventional SPPS (1,000L)</td>
+              <td>1</td>
+              <td>1,000</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>15L Microwave Synthesizers</td>
+              <td>20</td>
+              <td>300</td>
+              <td>20</td>
+            </tr>
+            <tr class="highlight-row">
+              <td>30L Microwave Synthesizers (PeptiWave30)</td>
+              <td>10</td>
+              <td>300</td>
+              <td>10</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>2. Capital Expenditure (CapEx)</h2>
+      <p>
+        PeptiWave30 30L design requires fewer units and offers a capital cost comparable to conventional SPPS but far less than multiple smaller microwave units.
+      </p>
+
+      <div class="table-responsive-container">
+        <table>
+          <thead>
+            <tr>
+              <th>System Type</th>
+              <th>CapEx Range (₹ crores)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Conventional SPPS (1,000L)</td>
+              <td>₹32.1 – ₹48.1</td>
+            </tr>
+            <tr>
+              <td>15L Microwave Synthesizers (20 units)</td>
+              <td>₹105.4 – ₹149.3</td>
+            </tr>
+            <tr class="highlight-row">
+              <td>30L Microwave Synthesizers (10 units)</td>
+              <td>₹38.5 – ₹48.1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>3. Operating Expenditure (OpEx) Including Hidden Costs</h2>
+      <p>
+        The 30L system achieves approximately <strong>70% lower operating expenses</strong> versus conventional SPPS and roughly 37% lower than 15L microwaves, making it highly cost-effective.
+      </p>
+
+      <div class="table-responsive-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Cost Type</th>
+              <th>Conventional SPPS (₹ Cr)</th>
+              <th>15L Microwave (₹ Cr)</th>
+              <th>30L PeptiWave30 (₹ Cr)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Direct Operating Cost</td>
+              <td>44.3</td>
+              <td>24.0</td>
+              <td>14.1</td>
+            </tr>
+            <tr>
+              <td>Runtime-Related Loss</td>
+              <td>5.0</td>
+              <td>1.7</td>
+              <td>1.0</td>
+            </tr>
+            <tr>
+              <td>Waste & Environmental Loss</td>
+              <td>10.0</td>
+              <td>3.3</td>
+              <td>1.7</td>
+            </tr>
+            <tr>
+              <td>Labor Costs</td>
+              <td>6.7</td>
+              <td>3.3</td>
+              <td>2.0</td>
+            </tr>
+            <tr>
+              <td>Automation & Upkeep</td>
+              <td>0.7</td>
+              <td>1.7</td>
+              <td>2.7</td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>Total OpEx (All Included)</strong></td>
+              <td><strong>66.7</strong></td>
+              <td><strong>34.0</strong></td>
+              <td><strong>21.5</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>4. Process Time, Labor, and Environmental Factors</h2>
+      <div class="table-responsive-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Conventional SPPS</th>
+              <th>15L Microwave Synthesizer</th>
+              <th>30L PeptiWave30</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Time to Produce 20kg Batch</td>
+              <td>7–10 days</td>
+              <td>2 days (parallel)</td>
+              <td>2 days (parallel)</td>
+            </tr>
+            <tr>
+              <td>Waste & Environmental Impact</td>
+              <td>Very High</td>
+              <td>Moderate</td>
+              <td>Lowest</td>
+            </tr>
+            <tr>
+              <td>Labor Intensity</td>
+              <td>High (large teams)</td>
+              <td>Moderate</td>
+              <td>Minimal (highly automated)</td>
+            </tr>
+            <tr>
+              <td>Automation Level</td>
+              <td>Low</td>
+              <td>Moderate</td>
+              <td>Very High</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. Summary Table: Total Cost and Performance (20kg Batch)</h2>
+      <div class="table-responsive-container">
+        <table>
+          <thead>
+            <tr>
+              <th>System Type</th>
+              <th>CapEx (₹ Cr)</th>
+              <th>OpEx (₹ Cr)</th>
+              <th>Machines</th>
+              <th>Batch Time</th>
+              <th>Impact</th>
+              <th>Labor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Conventional SPPS (1,000L)</td>
+              <td>32.1 – 48.1</td>
+              <td>66.7</td>
+              <td>1</td>
+              <td>7–10 days</td>
+              <td>Highest</td>
+              <td>Highest</td>
+            </tr>
+            <tr>
+              <td>15L Microwave (20 units)</td>
+              <td>105.4 – 149.3</td>
+              <td>34.0</td>
+              <td>20</td>
+              <td>2 days</td>
+              <td>Moderate</td>
+              <td>Moderate</td>
+            </tr>
+            <tr class="highlight-row">
+              <td>30L PeptiWave30 (10 units)</td>
+              <td>38.5 – 48.1</td>
+              <td>21.5</td>
+              <td>10</td>
+              <td>2 days</td>
+              <td>Lowest</td>
+              <td>Lowest</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>6. Why PeptiWave30 30L Microwave System is the Future</h2>
+      <ul>
+        <li><span class="highlight-badge">Cost Advantage:</span> Combined capital and operating expenses are the lowest among options for large-scale peptide production.</li>
+        <li><span class="highlight-badge">Process Efficiency:</span> Faster batch turnaround times enable more campaigns per month.</li>
+        <li><span class="highlight-badge">Sustainability:</span> Significantly reduced solvent and waste volumes make the system regulatory and eco-friendly.</li>
+        <li><span class="highlight-badge">Automation:</span> Highly automated operations cut labor needs and minimize human error.</li>
+        <li><span class="highlight-badge">Quality:</span> Improved batch consistency and crude purity facilitate downstream purification.</li>
+      </ul>
+
+      <!-- Callout Box -->
+      <div class="callout-box">
+        <h3>Deploy PeptiWave30 in Your Synthesis Line</h3>
+        <p>Connect with our pharmaceutical engineering division for technical validation and batch models.</p>
+        <a href="mailto:praveenyvv@clstechai.com" class="btn-cta-email">
+          <span>✉️</span> Contact praveenyvv@clstechai.com
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 CLS Tech AI Private Limited. All rights reserved. Data validated against 2025 industrial vendor benchmarks.</p>
+  </footer>
+
 </body>
 </html>

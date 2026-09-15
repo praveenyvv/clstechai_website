@@ -1,505 +1,902 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DRL Operations Dashboard</title>
-<style>
-  :root {
-    --color-background-primary: #ffffff;
-    --color-background-secondary: #f4f4f5;
-    --color-border-tertiary: #e4e4e7;
-    --color-text-primary: #18181b;
-    --color-text-secondary: #52525b;
-    --color-text-tertiary: #a1a1aa;
-    --border-radius-md: 6px;
-    --border-radius-lg: 10px;
-    --cyan: #00d4ff;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-background-primary: #0f1d3a;
-      --color-background-secondary: #1a2d52;
-      --color-border-tertiary: #1a2d52;
-      --color-text-primary: #f0f6ff;
-      --color-text-secondary: #7a93b8;
-      --color-text-tertiary: #4a5d7c;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dr. Reddy's Operations Dashboard — CLS Tech AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    // ── AUTH GUARD ──
+    const SESSION_KEY = 'cls_drl_auth';
+    const SESSION_TOKEN = 'drl_auth_granted_2025';
+    if (sessionStorage.getItem(SESSION_KEY) !== SESSION_TOKEN) {
+      window.location.replace('drl-login.html');
     }
-    body { background: #050d1f; color: var(--color-text-primary); }
-  }
+  </script>
 
-  body { margin: 0; font-family: system-ui, sans-serif; }
-  .dash { padding: 1rem 1.5rem; max-width: 1200px; margin: 0 auto; }
-  
-  /* Tabs Navigation */
-  .sys-tabs { 
-    display: flex; gap: 8px; margin-bottom: 1.5rem; 
-    border-bottom: 2px solid var(--color-border-tertiary); padding-bottom: 8px; 
-    overflow-x: auto;
-  }
-  .sys-tab { 
-    padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; 
-    border: none; background: transparent; color: var(--color-text-secondary); 
-    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
-    transition: all 0.2s; white-space: nowrap;
-  }
-  .sys-tab:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
-  .sys-tab.active { 
-    color: var(--color-text-primary); 
-    border-bottom: 3px solid #00d4ff; 
-    margin-bottom: -10px;
-  }
-  .tab-pane { display: none; animation: fadeIn 0.3s ease; }
-  .tab-pane.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  <style>
+    :root {
+      --bg-dark: #070c18;
+      --bg-surface: #0c1424;
+      --bg-card: rgba(13, 22, 38, 0.8);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(0, 212, 255, 0.4);
+      --cyan: #00d4ff;
+      --cyan-dim: rgba(0, 212, 255, 0.08);
+      --text-white: #ffffff;
+      --text-body: #94a3b8;
+      --text-muted: #64748b;
+      --status-ok: #10b981;
+      --status-warn: #f59e0b;
+      --status-err: #ef4444;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --transition: all 0.2s ease;
+    }
 
-  /* General UI elements */
-  .section-label { font-size: 13px; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 12px; }
-  .controls { display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap; }
-  .last-update { font-size:12px;color:var(--color-text-tertiary);margin-left:auto;font-style:italic; }
-  .btn-reset { font-size: 12px; padding: 4px 10px; background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); border-radius: 4px; cursor: pointer; transition: 0.2s;}
-  .btn-reset:hover { background: var(--color-border-tertiary); }
-  
-  /* Cards */
-  .cards { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:2rem; }
-  .card { background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px 20px;position:relative;transition:transform .2s;display:flex;flex-direction:column; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-  .card:hover { transform:translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-  .card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--color-border-tertiary);padding-bottom:8px; }
-  .item-name { font-size:15px;font-weight:600;color:var(--color-text-primary);margin:0; }
-  .item-id { font-size:11px;color:var(--color-text-tertiary);background:var(--color-background-secondary);padding:3px 6px;border-radius:4px;margin:0; font-family: monospace; }
-  
-  .val-wrapper { display:flex;align-items:baseline;gap:6px;margin-bottom:6px; }
-  .val-value { font-size:32px;font-weight:600;margin:0;line-height:1;letter-spacing:-0.02em; }
-  .val-unit { font-size:13px;color:var(--color-text-secondary); font-weight: 500; }
-  
-  .sub-metrics { font-size:12px; color:var(--color-text-secondary); margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px;}
-  .sub-metric-row { display: flex; justify-content: space-between; background: var(--color-background-secondary); padding: 4px 8px; border-radius: 4px; }
-  
-  .status-row { display:flex;align-items:center;font-size:12px;color:var(--color-text-secondary);margin-top:auto;padding-top:12px;border-top:1px dashed var(--color-border-tertiary); }
-  .status-dot { width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px; box-shadow: 0 0 4px currentColor;}
-  .trend { margin-left:auto;font-size:12px;font-weight:600; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* Charts */
-  .chart-wrap { background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:2rem; }
-  
-  /* Highlight Totalizer */
-  .totalizer-box { background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); color: var(--color-text-primary); padding: 8px; border-radius: 6px; margin-top: 8px; text-align: center;}
-  .totalizer-val { font-size: 18px; font-weight: 700; color: #00b8d4; }
-</style>
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle 800px at 85% 10%, rgba(0, 212, 255, 0.05), transparent 70%),
+        radial-gradient(circle 600px at 15% 60%, rgba(0, 100, 220, 0.05), transparent 60%);
+    }
+
+    /* TOP BAR */
+    header.dash-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 70px;
+      background: rgba(7, 12, 24, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1rem, 3vw, 2.5rem);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .cls-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+    .cls-logo img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .divider-v {
+      width: 1px;
+      height: 18px;
+      background: var(--border-subtle);
+    }
+
+    .client-title {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-body);
+    }
+
+    .dash-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--status-ok);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.3rem 0.75rem;
+      border-radius: 100px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--status-ok);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--status-ok);
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      font-family: var(--font-family);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: var(--transition);
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fff;
+    }
+
+    /* DASHBOARD WRAPPER */
+    .dash-main {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 4rem;
+    }
+
+    /* CONTROLS */
+    .controls-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1.25rem;
+    }
+
+    .controls-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .last-update-text {
+      font-size: 0.82rem;
+      color: var(--text-body);
+      font-family: monospace;
+    }
+
+    .btn-zoom-reset {
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-white);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-zoom-reset:hover {
+      background: var(--cyan-dim);
+      border-color: var(--border-focus);
+      color: var(--cyan);
+    }
+
+    /* TABS */
+    .sys-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .sys-tab {
+      padding: 0.65rem 1.25rem;
+      font-family: var(--font-family);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-body);
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .sys-tab:hover {
+      background: rgba(18, 30, 52, 0.8);
+      color: var(--text-white);
+    }
+
+    .sys-tab.active {
+      background: var(--cyan-dim);
+      border-color: var(--border-focus);
+      color: var(--cyan);
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-label {
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--cyan);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    /* CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .telemetry-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+    }
+
+    .telemetry-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.55rem;
+    }
+
+    .device-name {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .device-id {
+      font-size: 0.72rem;
+      font-family: monospace;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .value-display {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .main-val {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .main-unit {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-body);
+    }
+
+    .sub-telemetry-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      background: rgba(7, 12, 24, 0.6);
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-body);
+    }
+    .sub-row strong {
+      color: var(--text-white);
+    }
+
+    .totalizer-container {
+      background: var(--cyan-dim);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .totalizer-lbl {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-body);
+      margin-bottom: 2px;
+    }
+
+    .totalizer-number {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .card-footer-status {
+      display: flex;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.65rem;
+      border-top: 1px dashed var(--border-subtle);
+      font-size: 0.78rem;
+    }
+
+    .status-dot-sm {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .trend-indicator {
+      margin-left: auto;
+      font-weight: 600;
+      font-size: 0.76rem;
+    }
+
+    /* CHART BOX */
+    .chart-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .chart-container-inner {
+      position: relative;
+      width: 100%;
+      height: 260px;
+    }
+
+    @media (max-width: 600px) {
+      .brand-group .client-title {
+        display: none;
+      }
+      .controls-strip {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<div class="dash">
-  <div class="controls">
-    <span style="font-size:18px;font-weight:700;color:var(--color-text-primary); font-family: 'Syne', sans-serif;">🧪 Operations Dashboard</span>
-    
-    <div style="width:1px;height:20px;background:var(--color-border-tertiary);margin:0 10px;"></div>
-    
-    <button class="btn-reset" onclick="resetCurrentZoom()">⟲ Reset Chart Zoom</button>
-    <span class="last-update" id="last-update">Connecting…</span>
-  </div>
+  <div class="bg-mesh"></div>
 
-  <div class="sys-tabs">
-    <button class="sys-tab" onclick="switchTab('fire', this)">🔥 Fire Systems</button>
-    <button class="sys-tab" onclick="switchTab('motor', this)">⚙️ Motor Systems</button>
-    <button class="sys-tab active" onclick="switchTab('flow', this)">💧 Flow Meters</button>
-  </div>
-
-  <div id="fire-pane" class="tab-pane">
-    <p class="section-label">Fire Prevention & Detection Zones</p>
-    <div class="cards" id="fire-cards"></div>
-    
-    <p class="section-label">Smoke Level Trend (% Obscuration) - Drag to Zoom</p>
-    <div class="chart-wrap">
-      <div style="position:relative;width:100%;height:240px;">
-        <canvas id="fireChart"></canvas>
+  <!-- HEADER -->
+  <header class="dash-header">
+    <div class="brand-group">
+      <a href="index.html" class="cls-logo" title="Back to CLS Tech AI Website">
+        <img src="logo.jpg" alt="CLS Tech AI">
+        CLS TECH AI
+      </a>
+      <div class="divider-v"></div>
+      <div class="client-title">
+        <span>🧪</span> Dr. Reddy's Operations
       </div>
     </div>
-  </div>
 
-  <div id="motor-pane" class="tab-pane">
-    <p class="section-label">Industrial Motors & Pumps</p>
-    <div class="cards" id="motor-cards"></div>
-    <p class="section-label">Motor RPM Trend - Drag to Zoom</p>
-    <div class="chart-wrap">
-      <div style="position:relative;width:100%;height:240px;">
-        <canvas id="motorChart"></canvas>
+    <div class="dash-header-actions">
+      <div class="status-indicator">
+        <span class="pulse-dot"></span>
+        <span>Telemetry Live</span>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()" title="End Session and Logout">
+        <span>⏻</span> Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD -->
+  <main class="dash-main">
+    <div class="controls-strip">
+      <div class="controls-left">
+        <button class="btn-zoom-reset" onclick="resetCurrentZoom()">⟲ Reset Zoom</button>
+        <span style="font-size:0.75rem; color:var(--text-muted);">| Drag horizontally on chart to zoom</span>
+      </div>
+      <div class="last-update-text" id="last-update">Connecting stream…</div>
+    </div>
+
+    <div class="sys-tabs">
+      <button class="sys-tab active" onclick="switchTab('flow', this)">💧 Flow Meters</button>
+      <button class="sys-tab" onclick="switchTab('motor', this)">⚙️ Motor Systems</button>
+      <button class="sys-tab" onclick="switchTab('fire', this)">🔥 Cleanroom Safety & Fire</button>
+    </div>
+
+    <!-- FLOW PANE -->
+    <div id="flow-pane" class="tab-pane active">
+      <p class="section-label">Flow Transmitters — Live Rate & Totalizer</p>
+      <div class="cards-grid" id="flow-cards"></div>
+
+      <p class="section-label">Flow Rate Telemetry (L/min)</p>
+      <div class="chart-box">
+        <div class="chart-container-inner">
+          <canvas id="flowChart"></canvas>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="flow-pane" class="tab-pane active">
-    <p class="section-label">Flow meters — Live Rate & Totalizer</p>
-    <div class="cards" id="flow-cards"></div>
+    <!-- MOTOR PANE -->
+    <div id="motor-pane" class="tab-pane">
+      <p class="section-label">Heavy Drives & Pumps</p>
+      <div class="cards-grid" id="motor-cards"></div>
 
-    <p class="section-label">Flow Rate Trend (L/min) - Drag to Zoom</p>
-    <div class="chart-wrap">
-      <div style="position:relative;width:100%;height:260px;">
-        <canvas id="flowChart"></canvas>
+      <p class="section-label">Motor RPM Trend</p>
+      <div class="chart-box">
+        <div class="chart-container-inner">
+          <canvas id="motorChart"></canvas>
+        </div>
       </div>
     </div>
-  </div>
 
-</div>
+    <!-- FIRE PANE -->
+    <div id="fire-pane" class="tab-pane">
+      <p class="section-label">Cleanroom Safety Zones</p>
+      <div class="cards-grid" id="fire-cards"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
-
-<script>
-// --- DATA DEFINITIONS ---
-
-const FIRE_ZONES = [
-  { id: 'FZ-01', name: 'Raw Material Warehouse', mac: 'FS:01' },
-  { id: 'FZ-02', name: 'Packaging Line A', mac: 'FS:02' },
-  { id: 'FZ-03', name: 'Chemical Storage', mac: 'FS:03' }
-];
-
-const MOTORS = [
-  { id: 'MTR-1', name: 'Main Chiller Pump', mac: 'MT:A1' },
-  { id: 'MTR-2', name: 'Exhaust Fan A', mac: 'MT:A2' },
-  { id: 'MTR-3', name: 'Conveyor Drive', mac: 'MT:A3' }
-];
-
-const FLOW_METERS = [
-  { id:'ETp-1', name:'Effluent Line 1', mac:'FM:01', totalizer: 14520.5 },
-  { id:'ETp-2', name:'Effluent Line 2', mac:'FM:02', totalizer: 32904.1 },
-];
-
-const FIRE_COLORS = ['#E24B4A', '#EF9F27', '#7F77DD'];
-const FLOW_COLORS = ['#0FA3B1','#E76F51'];
-const MOTOR_COLORS = ['#378ADD','#EF9F27','#7F77DD'];
-const INTERVAL_MS = 10000; // 10 seconds
-
-let fireHistory = FIRE_ZONES.map(() => []);
-let motorHistory = MOTORS.map(() => []);
-let flowHistory = FLOW_METERS.map(() => []);
-
-let fireChart = null;
-let motorChart = null;
-let flowChart = null;
-let currentTab = 'flow';
-
-// --- UTILS ---
-function getTimeLabels(n) {
-  return Array.from({length:n}, (_,i) => {
-    const d = new Date(Date.now() - (n-1-i) * INTERVAL_MS);
-    return d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
-  });
-}
-
-function formatNum(num) {
-  return new Intl.NumberFormat('en-US').format(num);
-}
-
-// Global Zoom Config for all charts
-const zoomConfig = {
-  zoom: {
-    drag: {
-      enabled: true,
-      backgroundColor: 'rgba(0, 212, 255, 0.2)' // Cyan rubber band box
-    },
-    mode: 'x', // Only allow horizontal zooming
-  }
-};
-
-function resetCurrentZoom() {
-  if(currentTab === 'fire' && fireChart) fireChart.resetZoom();
-  if(currentTab === 'motor' && motorChart) motorChart.resetZoom();
-  if(currentTab === 'flow' && flowChart) flowChart.resetZoom();
-}
-
-// --- TAB SWITCHING ---
-function switchTab(tabId, btnElement) {
-  currentTab = tabId;
-  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.sys-tab').forEach(el => el.classList.remove('active'));
-  
-  document.getElementById(tabId + '-pane').classList.add('active');
-  btnElement.classList.add('active');
-
-  // Trigger chart renders to fix canvas sizing when unhidden
-  if(tabId === 'fire') renderFireChart();
-  if(tabId === 'motor') renderMotorChart();
-  if(tabId === 'flow') renderFlowChart();
-}
-
-
-// --- 1. FIRE SYSTEMS RENDER ---
-function renderFireCards(data) {
-  const wrap = document.getElementById('fire-cards');
-  wrap.innerHTML = '';
-  data.forEach(d => {
-    const isAlert = d.smokeLevel > 15;
-    const statusText = isAlert ? 'Smoke Detected' : 'System Normal';
-    const statusColor = isAlert ? '#E24B4A' : '#1D9E75';
-    
-    wrap.innerHTML += `
-      <div class="card" style="border-color: ${isAlert ? '#E24B4A' : 'var(--color-border-tertiary)'}">
-        <div class="card-header">
-          <span class="item-name">${d.name}</span>
-          <span class="item-id">${d.id}</span>
+      <p class="section-label">Smoke Level (% Obscuration)</p>
+      <div class="chart-box">
+        <div class="chart-container-inner">
+          <canvas id="fireChart"></canvas>
         </div>
-        <div class="sub-metrics">
-          <div class="sub-metric-row"><span>Smoke Level:</span> <strong>${d.smokeLevel.toFixed(1)} % / Obscuration</strong></div>
-          <div class="sub-metric-row"><span>Water Pressure:</span> <strong>${d.pressure} PSI</strong></div>
-          <div class="sub-metric-row"><span>Sprinkler Valve:</span> <strong>${d.valveOpen ? 'OPEN / ACTIVE' : 'Closed / Standby'}</strong></div>
-        </div>
-        <div class="status-row">
-          <span class="status-dot" style="background:${statusColor}; color:${statusColor}"></span>
-          <span style="color:${statusColor};font-weight:600">${statusText}</span>
-        </div>
-      </div>`;
-  });
-}
+      </div>
+    </div>
+  </main>
 
-function renderFireChart() {
-  if (currentTab !== 'fire') return;
-  const labels = getTimeLabels(15);
-  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  const datasets = FIRE_ZONES.map((z,i) => ({
-    label: z.name + ' (Smoke %)',
-    data: fireHistory[i].slice(-15),
-    borderColor: FIRE_COLORS[i], backgroundColor: FIRE_COLORS[i]+'18',
-    borderWidth:2, pointRadius:3, tension:0.4, fill:true,
-  }));
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 
-  // Update existing chart instead of destroying to PRESERVE user zoom state
-  if (fireChart) {
-    fireChart.data.labels = labels;
-    fireChart.data.datasets = datasets;
-    fireChart.update('none'); 
-  } else {
-    fireChart = new Chart(document.getElementById('fireChart'), {
-      type:'line', data:{ labels, datasets },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        interaction:{ mode:'index', intersect:false },
-        plugins:{ 
-          legend:{ labels:{ color:isDark?'#b4b2a9':'#5f5e5a' } },
-          zoom: zoomConfig
+  <script>
+    function handleLogout() {
+      sessionStorage.removeItem(SESSION_KEY);
+      window.location.replace('customer-login.html');
+    }
+
+    const FIRE_ZONES = [
+      { id: 'FZ-01', name: 'Raw Material Warehouse', mac: 'FS:01' },
+      { id: 'FZ-02', name: 'PeptiWave Cleanroom Suite', mac: 'FS:02' },
+      { id: 'FZ-03', name: 'Chemical Storage', mac: 'FS:03' }
+    ];
+
+    const MOTORS = [
+      { id: 'MTR-1', name: 'Main Chiller Pump', mac: 'MT:A1' },
+      { id: 'MTR-2', name: 'Cleanroom Exhaust Fan', mac: 'MT:A2' },
+      { id: 'MTR-3', name: 'Agitator Drive', mac: 'MT:A3' }
+    ];
+
+    const FLOW_METERS = [
+      { id: 'ETp-1', name: 'Process Effluent Line 1', mac: 'FM:01', totalizer: 14520.5 },
+      { id: 'ETp-2', name: 'Solvent Recovery Line 2', mac: 'FM:02', totalizer: 32904.1 }
+    ];
+
+    const FIRE_COLORS = ['#ef4444', '#f59e0b', '#8b5cf6'];
+    const FLOW_COLORS = ['#00d4ff', '#38bdf8'];
+    const MOTOR_COLORS = ['#3b82f6', '#f59e0b', '#a855f7'];
+    const INTERVAL_MS = 6000;
+
+    let fireHistory = FIRE_ZONES.map(() => []);
+    let motorHistory = MOTORS.map(() => []);
+    let flowHistory = FLOW_METERS.map(() => []);
+
+    let fireChart = null;
+    let motorChart = null;
+    let flowChart = null;
+    let currentTab = 'flow';
+
+    function getTimeLabels(n) {
+      return Array.from({ length: n }, (_, i) => {
+        const d = new Date(Date.now() - (n - 1 - i) * INTERVAL_MS);
+        return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0');
+      });
+    }
+
+    function formatNum(num) {
+      return new Intl.NumberFormat('en-US').format(num);
+    }
+
+    const zoomConfig = {
+      zoom: {
+        drag: {
+          enabled: true,
+          backgroundColor: 'rgba(0, 212, 255, 0.2)'
         },
-        scales:{
-          x:{ ticks:{color:isDark?'#888':'#999'} },
-          y:{ min:0, ticks:{color:isDark?'#888':'#999', callback:v=>v+' %'} }
-        }
+        mode: 'x'
       }
-    });
-  }
-}
-
-
-// --- 2. MOTOR SYSTEMS RENDER ---
-function renderMotorCards(data) {
-  const wrap = document.getElementById('motor-cards');
-  wrap.innerHTML = '';
-  data.forEach((d, i) => {
-    const prev = motorHistory[i].length >= 2 ? motorHistory[i][motorHistory[i].length-2] : d.rpm;
-    const trend = d.rpm > prev ? '↑' : d.rpm < prev ? '↓' : '→';
-    const isWarning = d.temp > 75;
-    const statusColor = isWarning ? '#EF9F27' : '#1D9E75';
-
-    wrap.innerHTML += `
-      <div class="card">
-        <div class="card-header">
-          <span class="item-name">${d.name}</span>
-          <span class="item-id">${d.id}</span>
-        </div>
-        <div class="val-wrapper">
-          <span class="val-value" style="color:${MOTOR_COLORS[i]}">${d.rpm.toFixed(0)}</span>
-          <span class="val-unit">RPM</span>
-        </div>
-        <div class="sub-metrics">
-          <div class="sub-metric-row"><span>Casing Temp:</span> <strong style="color:${isWarning?'#EF9F27':'inherit'}">${d.temp.toFixed(1)} °C</strong></div>
-          <div class="sub-metric-row"><span>Vibration (RMS):</span> <strong>${d.vibration.toFixed(2)} mm/s</strong></div>
-        </div>
-        <div class="status-row">
-          <span class="status-dot" style="background:${statusColor}; color:${statusColor}"></span>
-          <span style="color:${statusColor};font-weight:500">${isWarning ? 'High Temp Warn' : 'Running Smooth'}</span>
-          <span class="trend">${trend} ${Math.abs(d.rpm - prev).toFixed(0)}</span>
-        </div>
-      </div>`;
-  });
-}
-
-function renderMotorChart() {
-  if (currentTab !== 'motor') return;
-  const labels = getTimeLabels(15);
-  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  const datasets = MOTORS.map((m,i) => ({
-    label: m.name,
-    data: motorHistory[i].slice(-15),
-    borderColor: MOTOR_COLORS[i], backgroundColor: MOTOR_COLORS[i]+'18',
-    borderWidth:2, pointRadius:3, tension:0.4, fill:true,
-  }));
-
-  if (motorChart) {
-    motorChart.data.labels = labels;
-    motorChart.data.datasets = datasets;
-    motorChart.update('none');
-  } else {
-    motorChart = new Chart(document.getElementById('motorChart'), {
-      type:'line', data:{ labels, datasets },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        interaction:{ mode:'index', intersect:false },
-        plugins:{ 
-          legend:{ labels:{ color:isDark?'#b4b2a9':'#5f5e5a' } },
-          zoom: zoomConfig 
-        },
-        scales:{
-          x:{ ticks:{color:isDark?'#888':'#999'} },
-          y:{ ticks:{color:isDark?'#888':'#999', callback:v=>v+' rpm'} }
-        }
-      }
-    });
-  }
-}
-
-
-// --- 3. FLOW METERS RENDER ---
-function renderFlowCards(data) {
-  const wrap = document.getElementById('flow-cards');
-  wrap.innerHTML = '';
-  data.forEach((d,i) => {
-    const prev = flowHistory[i].length >= 2 ? flowHistory[i][flowHistory[i].length-2] : d.flow;
-    const delta = d.flow - prev;
-    const trend = Math.abs(delta) < 0.5 ? '→' : delta > 0 ? '↑' : '↓';
-    const statusOk = d.flow > 10 && d.flow < 90;
-    const statusColor = statusOk ? '#1D9E75' : '#E24B4A';
-    
-    wrap.innerHTML += `
-      <div class="card">
-        <div class="card-header">
-          <span class="item-name">${d.name}</span>
-          <span class="item-id">${d.id}</span>
-        </div>
-        <div class="val-wrapper">
-          <span class="val-value" style="color:${FLOW_COLORS[i]}">${d.flow.toFixed(1)}</span>
-          <span class="val-unit">L/min (Live Rate)</span>
-        </div>
-        
-        <div class="totalizer-box">
-          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom:2px;">Cumulative Totalizer</div>
-          <div class="totalizer-val">${formatNum(d.totalizer.toFixed(1))} L</div>
-        </div>
-
-        <div class="status-row">
-          <span class="status-dot" style="background:${statusColor}; color:${statusColor}"></span>
-          <span style="color:${statusColor};font-weight:${statusOk?'400':'500'}">${statusOk ? 'Flow Nominal' : 'Flow Warning'}</span>
-          <span class="trend" style="color:var(--color-text-secondary)">${trend} ${Math.abs(delta).toFixed(1)}</span>
-        </div>
-      </div>`;
-  });
-}
-
-function renderFlowChart() {
-  if (currentTab !== 'flow') return;
-  const labels = getTimeLabels(15);
-  const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  const datasets = FLOW_METERS.map((fm,i) => ({
-    label: fm.name + ' (L/min)',
-    data: flowHistory[i].slice(-15),
-    borderColor: FLOW_COLORS[i], backgroundColor: FLOW_COLORS[i]+'18',
-    borderWidth:2, pointRadius:3, tension:0.4, fill:false,
-  }));
-
-  if (flowChart) {
-    flowChart.data.labels = labels;
-    flowChart.data.datasets = datasets;
-    flowChart.update('none');
-  } else {
-    flowChart = new Chart(document.getElementById('flowChart'), {
-      type:'line', data:{ labels, datasets },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        interaction:{ mode:'index', intersect:false },
-        plugins:{ 
-          legend:{ labels:{ color:isDark?'#b4b2a9':'#5f5e5a' } },
-          zoom: zoomConfig
-        },
-        scales:{
-          x:{ ticks:{color:isDark?'#888':'#999'} },
-          y:{ min:0, max:120, ticks:{color:isDark?'#888':'#999'} }
-        }
-      }
-    });
-  }
-}
-
-
-// --- DATA SIMULATION LOOP ---
-function simulateFetch() {
-  document.getElementById('last-update').textContent = 'Live • ' + new Date().toLocaleTimeString();
-
-  // 1. Sim Fire Systems
-  const fireData = FIRE_ZONES.map((z, i) => {
-    const lastSmoke = fireHistory[i].length ? fireHistory[i][fireHistory[i].length-1] : 2;
-    let smoke = Math.max(0, Math.min(100, lastSmoke + (Math.random() - 0.45) * 3));
-    
-    // Rare random spike
-    if (Math.random() > 0.97) smoke = 20 + Math.random() * 10; 
-
-    return {
-      ...z,
-      smokeLevel: smoke,
-      pressure: Math.round(115 + Math.random() * 10),
-      valveOpen: smoke > 15
     };
-  });
-  fireData.forEach((d, i) => {
-    fireHistory[i].push(d.smokeLevel);
-    if(fireHistory[i].length > 50) fireHistory[i].shift(); // Store more data for zooming
-  });
-  renderFireCards(fireData);
-  renderFireChart();
 
-  // 2. Sim Motor Systems
-  const motorData = MOTORS.map((m, i) => {
-    const lastRpm = motorHistory[i].length ? motorHistory[i][motorHistory[i].length-1] : 1450;
-    const rpm = Math.max(0, Math.min(1800, lastRpm + (Math.random() - 0.45) * 50));
-    return {
-      ...m,
-      rpm: rpm,
-      temp: 40 + (rpm / 1800) * 40 + Math.random() * 5, 
-      vibration: 1.2 + (rpm / 1800) * 2 + Math.random()
-    };
-  });
-  motorData.forEach((d, i) => {
-    motorHistory[i].push(d.rpm);
-    if(motorHistory[i].length > 50) motorHistory[i].shift();
-  });
-  renderMotorCards(motorData);
-  renderMotorChart();
+    function resetCurrentZoom() {
+      if (currentTab === 'fire' && fireChart) fireChart.resetZoom();
+      if (currentTab === 'motor' && motorChart) motorChart.resetZoom();
+      if (currentTab === 'flow' && flowChart) flowChart.resetZoom();
+    }
 
-  // 3. Sim Flow Meters + Totalizer Math
-  const flowData = FLOW_METERS.map((fm, i) => {
-    const lastFlow = flowHistory[i].length ? flowHistory[i][flowHistory[i].length-1] : 45;
-    const flow = Math.max(0, Math.min(120, lastFlow + (Math.random() - 0.45) * 12));
-    
-    const addedVolume = flow * (INTERVAL_MS / 1000 / 60);
-    fm.totalizer += addedVolume;
+    function switchTab(tabId, btnElement) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sys-tab').forEach(el => el.classList.remove('active'));
 
-    return { ...fm, flow: flow };
-  });
-  flowData.forEach((d, i) => {
-    flowHistory[i].push(d.flow);
-    if(flowHistory[i].length > 50) flowHistory[i].shift();
-  });
-  renderFlowCards(flowData);
-  renderFlowChart();
-}
+      document.getElementById(tabId + '-pane').classList.add('active');
+      btnElement.classList.add('active');
 
-// Start simulation
-simulateFetch();
-setInterval(simulateFetch, INTERVAL_MS);
+      if (tabId === 'fire') renderFireChart();
+      if (tabId === 'motor') renderMotorChart();
+      if (tabId === 'flow') renderFlowChart();
+    }
 
-</script>
+    // 1. FLOW
+    function renderFlowCards(data) {
+      const wrap = document.getElementById('flow-cards');
+      wrap.innerHTML = '';
+      data.forEach((d, i) => {
+        const prev = flowHistory[i].length >= 2 ? flowHistory[i][flowHistory[i].length - 2] : d.flow;
+        const delta = d.flow - prev;
+        const trend = Math.abs(delta) < 0.5 ? '→' : delta > 0 ? '↑' : '↓';
+        const statusOk = d.flow > 10 && d.flow < 90;
+        const statusColor = statusOk ? '#10b981' : '#ef4444';
+
+        wrap.innerHTML += `
+          <div class="telemetry-card">
+            <div class="card-top">
+              <span class="device-name">${d.name}</span>
+              <span class="device-id">${d.id}</span>
+            </div>
+            <div class="value-display">
+              <span class="main-val" style="color:${FLOW_COLORS[i]}">${d.flow.toFixed(1)}</span>
+              <span class="main-unit">L/min (Rate)</span>
+            </div>
+            <div class="totalizer-container">
+              <div class="totalizer-lbl">Cumulative Totalizer</div>
+              <div class="totalizer-number">${formatNum(d.totalizer.toFixed(1))} L</div>
+            </div>
+            <div class="card-footer-status">
+              <span class="status-dot-sm" style="background:${statusColor}"></span>
+              <span style="color:${statusColor}; font-weight:600">${statusOk ? 'Flow Nominal' : 'Flow Warning'}</span>
+              <span class="trend-indicator" style="color:var(--text-body)">${trend} ${Math.abs(delta).toFixed(1)}</span>
+            </div>
+          </div>`;
+      });
+    }
+
+    function renderFlowChart() {
+      if (currentTab !== 'flow') return;
+      const labels = getTimeLabels(15);
+
+      const datasets = FLOW_METERS.map((fm, i) => ({
+        label: fm.name + ' (L/min)',
+        data: flowHistory[i].slice(-15),
+        borderColor: FLOW_COLORS[i],
+        backgroundColor: FLOW_COLORS[i] + '15',
+        borderWidth: 2,
+        pointRadius: 3,
+        tension: 0.35,
+        fill: true
+      }));
+
+      if (flowChart) {
+        flowChart.data.labels = labels;
+        flowChart.data.datasets = datasets;
+        flowChart.update('none');
+      } else {
+        flowChart = new Chart(document.getElementById('flowChart'), {
+          type: 'line',
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } },
+              zoom: zoomConfig
+            },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } },
+              y: { min: 0, max: 120, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } }
+            }
+          }
+        });
+      }
+    }
+
+    // 2. MOTOR
+    function renderMotorCards(data) {
+      const wrap = document.getElementById('motor-cards');
+      wrap.innerHTML = '';
+      data.forEach((d, i) => {
+        const prev = motorHistory[i].length >= 2 ? motorHistory[i][motorHistory[i].length - 2] : d.rpm;
+        const trend = d.rpm > prev ? '↑' : d.rpm < prev ? '↓' : '→';
+        const isWarning = d.temp > 75;
+        const statusColor = isWarning ? '#f59e0b' : '#10b981';
+
+        wrap.innerHTML += `
+          <div class="telemetry-card">
+            <div class="card-top">
+              <span class="device-name">${d.name}</span>
+              <span class="device-id">${d.id}</span>
+            </div>
+            <div class="value-display">
+              <span class="main-val" style="color:${MOTOR_COLORS[i]}">${d.rpm.toFixed(0)}</span>
+              <span class="main-unit">RPM</span>
+            </div>
+            <div class="sub-telemetry-rows">
+              <div class="sub-row">
+                <span>Casing Temp:</span>
+                <strong style="color:${isWarning ? '#f59e0b' : 'inherit'}">${d.temp.toFixed(1)} °C</strong>
+              </div>
+              <div class="sub-row">
+                <span>Vibration (RMS):</span>
+                <strong>${d.vibration.toFixed(2)} mm/s</strong>
+              </div>
+            </div>
+            <div class="card-footer-status">
+              <span class="status-dot-sm" style="background:${statusColor}"></span>
+              <span style="color:${statusColor}; font-weight:600">${isWarning ? 'High Temp Warn' : 'Running Smooth'}</span>
+              <span class="trend-indicator" style="color:var(--text-body)">${trend} ${Math.abs(d.rpm - prev).toFixed(0)}</span>
+            </div>
+          </div>`;
+      });
+    }
+
+    function renderMotorChart() {
+      if (currentTab !== 'motor') return;
+      const labels = getTimeLabels(15);
+
+      const datasets = MOTORS.map((m, i) => ({
+        label: m.name,
+        data: motorHistory[i].slice(-15),
+        borderColor: MOTOR_COLORS[i],
+        backgroundColor: MOTOR_COLORS[i] + '15',
+        borderWidth: 2,
+        pointRadius: 3,
+        tension: 0.35,
+        fill: true
+      }));
+
+      if (motorChart) {
+        motorChart.data.labels = labels;
+        motorChart.data.datasets = datasets;
+        motorChart.update('none');
+      } else {
+        motorChart = new Chart(document.getElementById('motorChart'), {
+          type: 'line',
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } },
+              zoom: zoomConfig
+            },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } },
+              y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', callback: v => v + ' rpm' } }
+            }
+          }
+        });
+      }
+    }
+
+    // 3. FIRE
+    function renderFireCards(data) {
+      const wrap = document.getElementById('fire-cards');
+      wrap.innerHTML = '';
+      data.forEach(d => {
+        const isAlert = d.smokeLevel > 15;
+        const statusText = isAlert ? 'Smoke Detected' : 'System Normal';
+        const statusColor = isAlert ? '#ef4444' : '#10b981';
+
+        wrap.innerHTML += `
+          <div class="telemetry-card" style="border-color:${isAlert ? '#ef4444' : 'var(--border-subtle)'}">
+            <div class="card-top">
+              <span class="device-name">${d.name}</span>
+              <span class="device-id">${d.id}</span>
+            </div>
+            <div class="sub-telemetry-rows">
+              <div class="sub-row">
+                <span>Smoke Level:</span>
+                <strong style="color:${isAlert ? '#ef4444' : 'inherit'}">${d.smokeLevel.toFixed(1)} % / Obscuration</strong>
+              </div>
+              <div class="sub-row">
+                <span>Water Pressure:</span>
+                <strong>${d.pressure} PSI</strong>
+              </div>
+              <div class="sub-row">
+                <span>Sprinkler Valve:</span>
+                <strong style="color:${d.valveOpen ? '#ef4444' : '#10b981'}">${d.valveOpen ? 'OPEN / ACTIVE' : 'Closed / Standby'}</strong>
+              </div>
+            </div>
+            <div class="card-footer-status">
+              <span class="status-dot-sm" style="background:${statusColor}"></span>
+              <span style="color:${statusColor}; font-weight:600">${statusText}</span>
+            </div>
+          </div>`;
+      });
+    }
+
+    function renderFireChart() {
+      if (currentTab !== 'fire') return;
+      const labels = getTimeLabels(15);
+
+      const datasets = FIRE_ZONES.map((z, i) => ({
+        label: z.name + ' (Smoke %)',
+        data: fireHistory[i].slice(-15),
+        borderColor: FIRE_COLORS[i],
+        backgroundColor: FIRE_COLORS[i] + '15',
+        borderWidth: 2,
+        pointRadius: 3,
+        tension: 0.35,
+        fill: true
+      }));
+
+      if (fireChart) {
+        fireChart.data.labels = labels;
+        fireChart.data.datasets = datasets;
+        fireChart.update('none');
+      } else {
+        fireChart = new Chart(document.getElementById('fireChart'), {
+          type: 'line',
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } },
+              zoom: zoomConfig
+            },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b' } },
+              y: { min: 0, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', callback: v => v + ' %' } }
+            }
+          }
+        });
+      }
+    }
+
+    // LOOP
+    function simulateFetch() {
+      document.getElementById('last-update').textContent = 'Live • ' + new Date().toLocaleTimeString();
+
+      // Fire
+      const fireData = FIRE_ZONES.map((z, i) => {
+        const lastSmoke = fireHistory[i].length ? fireHistory[i][fireHistory[i].length - 1] : 2;
+        let smoke = Math.max(0, Math.min(100, lastSmoke + (Math.random() - 0.45) * 2.5));
+        if (Math.random() > 0.98) smoke = 18 + Math.random() * 8;
+        return {
+          ...z,
+          smokeLevel: smoke,
+          pressure: Math.round(115 + Math.random() * 8),
+          valveOpen: smoke > 15
+        };
+      });
+      fireData.forEach((d, i) => {
+        fireHistory[i].push(d.smokeLevel);
+        if (fireHistory[i].length > 50) fireHistory[i].shift();
+      });
+      renderFireCards(fireData);
+      renderFireChart();
+
+      // Motors
+      const motorData = MOTORS.map((m, i) => {
+        const lastRpm = motorHistory[i].length ? motorHistory[i][motorHistory[i].length - 1] : 1450;
+        const rpm = Math.max(0, Math.min(1800, lastRpm + (Math.random() - 0.45) * 45));
+        return {
+          ...m,
+          rpm: rpm,
+          temp: 40 + (rpm / 1800) * 40 + Math.random() * 4,
+          vibration: 1.2 + (rpm / 1800) * 2 + Math.random() * 0.4
+        };
+      });
+      motorData.forEach((d, i) => {
+        motorHistory[i].push(d.rpm);
+        if (motorHistory[i].length > 50) motorHistory[i].shift();
+      });
+      renderMotorCards(motorData);
+      renderMotorChart();
+
+      // Flow
+      const flowData = FLOW_METERS.map((fm, i) => {
+        const lastFlow = flowHistory[i].length ? flowHistory[i][flowHistory[i].length - 1] : 45;
+        const flow = Math.max(0, Math.min(120, lastFlow + (Math.random() - 0.45) * 10));
+        const addedVolume = flow * (INTERVAL_MS / 1000 / 60);
+        fm.totalizer += addedVolume;
+        return { ...fm, flow: flow };
+      });
+      flowData.forEach((d, i) => {
+        flowHistory[i].push(d.flow);
+        if (flowHistory[i].length > 50) flowHistory[i].shift();
+      });
+      renderFlowCards(flowData);
+      renderFlowChart();
+    }
+
+    simulateFetch();
+    setInterval(simulateFetch, INTERVAL_MS);
+  </script>
+
 </body>
 </html>
