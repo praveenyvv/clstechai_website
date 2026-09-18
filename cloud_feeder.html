@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLS Tech AI — Cloud Telemetry Feeder / IoT Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #070c18;
+      color: #f8fafc;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .card {
+      background: #0d172a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    h1 { font-size: 1.5rem; color: #00d4ff; margin-bottom: 0.5rem; }
+    textarea {
+      width: 100%;
+      height: 140px;
+      background: #070c18;
+      border: 1px solid #1e293b;
+      color: #5ce1e6;
+      font-family: monospace;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin: 0.75rem 0;
+      box-sizing: border-box;
+    }
+    button {
+      background: #00d4ff;
+      color: #050d1a;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+    button.stop { background: #ef4444; color: white; }
+    .log-terminal {
+      background: #030712;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 1rem;
+      height: 250px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+    .log-line { margin-bottom: 4px; }
+    .log-success { color: #10b981; }
+    .status-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .status-idle { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <h1>📡 CLS Tech AI — Cloud Telemetry Feeder</h1>
+  <p style="color: #94a3b8; font-size: 0.9rem;">
+    This tool pumps simulated real-time industrial telemetry (Flow transmitters, Totalizers, Motors, Fire systems) directly into Google Firebase Firestore. Leave this tab running in the background to feed the live dashboard on your website.
+  </p>
+
+  <div class="card">
+    <h3>1. Firebase Config</h3>
+    <textarea id="configInput" placeholder='Paste your Firebase config here...'></textarea>
+    <div>
+      <button onclick="startFeeder()" id="startBtn">▶ Start Cloud Feeder</button>
+      <button onclick="stopFeeder()" id="stopBtn" class="stop" style="display:none;">⏹ Stop Feeder</button>
+      <span class="status-badge status-idle" id="statusBadge">Idle</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2. Real-Time Cloud Broadcast Logs</h3>
+    <div class="log-terminal" id="terminalLogs">
+      <div class="log-line">Waiting for feeder to start…</div>
+    </div>
+  </div>
+
+  <script>
+    let timer = null;
+    let db = null;
+    let totalizer1 = 14520.5;
+    let totalizer2 = 32904.1;
+
+    const defaultCfg = {
+      apiKey: "AIzaSyAWIkl0LwVKUoGANJttX98vkhBeFWvAzUE",
+      authDomain: "cls-drl-portal.firebaseapp.com",
+      projectId: "cls-drl-portal",
+      storageBucket: "cls-drl-portal.firebasestorage.app",
+      messagingSenderId: "807702139353",
+      appId: "1:807702139353:web:2a716ef52a5285a6d749c8",
+      measurementId: "G-H24V1PC9ND"
+    };
+
+    // Pre-populate if saved or use default
+    const saved = localStorage.getItem('cls_firebase_cfg_drl') || JSON.stringify(defaultCfg, null, 2);
+    document.getElementById('configInput').value = saved;
+
+    function log(msg, isSuccess = false) {
+      const term = document.getElementById('terminalLogs');
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.className = 'log-line ' + (isSuccess ? 'log-success' : '');
+      line.textContent = `[${time}] ${msg}`;
+      term.appendChild(line);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function startFeeder() {
+      let raw = document.getElementById('configInput').value.trim();
+      if (raw.includes('{') && raw.includes('}')) {
+        raw = raw.substring(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
+        raw = raw.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2": ').replace(/,\s*}/g, '}');
+      }
+
+      try {
+        const cfg = JSON.parse(raw);
+        localStorage.setItem('cls_firebase_cfg_drl', JSON.stringify(cfg));
+        
+        if (!firebase.apps.length) firebase.initializeApp(cfg);
+        db = firebase.firestore();
+
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'inline-block';
+        const badge = document.getElementById('statusBadge');
+        badge.className = 'status-badge status-active';
+        badge.textContent = 'Broadcasting to ' + cfg.projectId;
+
+        log("Connected to Firebase Firestore (" + cfg.projectId + ")", true);
+        
+        // Push every 6 seconds
+        sendPacket();
+        timer = setInterval(sendPacket, 6000);
+      } catch (err) {
+        alert("Invalid Firebase config. Please check your JSON syntax.");
+      }
+    }
+
+    function stopFeeder() {
+      clearInterval(timer);
+      document.getElementById('startBtn').style.display = 'inline-block';
+      document.getElementById('stopBtn').style.display = 'none';
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'status-badge status-idle';
+      badge.textContent = 'Idle';
+      log("Feeder paused.");
+    }
+
+    function sendPacket() {
+      const flow1 = Math.max(10, Math.min(110, 45 + (Math.random() - 0.48) * 15));
+      const flow2 = Math.max(10, Math.min(110, 60 + (Math.random() - 0.48) * 12));
+      totalizer1 += flow1 * (6 / 60);
+      totalizer2 += flow2 * (6 / 60);
+
+      const payload = {
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        client: "Dr. Reddy's Laboratories",
+        flowData: [
+          { id: 'ETp-1', name: 'Process Effluent Line 1', flow: flow1, totalizer: totalizer1 },
+          { id: 'ETp-2', name: 'Solvent Recovery Line 2', flow: flow2, totalizer: totalizer2 }
+        ],
+        motorData: [
+          { id: 'MTR-1', name: 'Main Chiller Pump', rpm: 1450 + (Math.random() - 0.5) * 60, temp: 45 + Math.random() * 5, vibration: 1.4 + Math.random() * 0.3 },
+          { id: 'MTR-2', name: 'Cleanroom Exhaust Fan', rpm: 1720 + (Math.random() - 0.5) * 40, temp: 52 + Math.random() * 4, vibration: 1.1 + Math.random() * 0.2 },
+          { id: 'MTR-3', name: 'Agitator Drive', rpm: 880 + (Math.random() - 0.5) * 30, temp: 41 + Math.random() * 3, vibration: 0.9 + Math.random() * 0.2 }
+        ],
+        fireData: [
+          { id: 'FZ-01', name: 'Raw Material Warehouse', smokeLevel: 1.5 + Math.random() * 1.5, pressure: 118, valveOpen: false },
+          { id: 'FZ-02', name: 'PeptiWave Cleanroom Suite', smokeLevel: 0.8 + Math.random() * 1.2, pressure: 120, valveOpen: false },
+          { id: 'FZ-03', name: 'Chemical Storage', smokeLevel: 2.1 + Math.random() * 2, pressure: 116, valveOpen: false }
+        ]
+      };
+
+      db.collection("drl_telemetry").add(payload)
+        .then(() => log(`✓ Pushed telemetry packet (Flow1: ${flow1.toFixed(1)} L/m, Tot: ${totalizer1.toFixed(1)} L)`, true))
+        .catch(e => log(`⚠️ Write failed: ${e.message}`));
+    }
+  </script>
+</body>
+</html>

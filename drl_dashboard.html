@@ -17,6 +17,10 @@
     }
   </script>
 
+  <!-- Google Firebase SDK (Compat Version for instant browser integration) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --bg-dark: #070c18;
@@ -75,7 +79,7 @@
       top: 0;
       z-index: 100;
       height: 70px;
-      background: rgba(7, 12, 24, 0.85);
+      background: rgba(7, 12, 24, 0.88);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
@@ -122,7 +126,26 @@
     .dash-header-actions {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.75rem;
+    }
+
+    /* Cloud Sync Badge */
+    .cloud-sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--cyan);
+      background: var(--cyan-dim);
+      border: 1px solid var(--border-focus);
+      padding: 0.3rem 0.75rem;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .cloud-sync-badge:hover {
+      background: rgba(0, 212, 255, 0.16);
     }
 
     .status-indicator {
@@ -180,6 +203,160 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 4rem;
+    }
+
+    /* CLOUD STATUS & CONFIG BANNER */
+    .cloud-banner {
+      background: linear-gradient(135deg, rgba(12, 24, 48, 0.9) 0%, rgba(8, 16, 32, 0.95) 100%);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .cloud-banner-info {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .cloud-icon-box {
+      width: 40px;
+      height: 40px;
+      background: var(--cyan-dim);
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+    }
+
+    .cloud-banner-text h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 0.15rem;
+    }
+
+    .cloud-banner-text p {
+      font-size: 0.82rem;
+      color: var(--text-body);
+    }
+
+    .cloud-banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-cloud-toggle {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      background: var(--cyan);
+      color: #050d1a;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-cloud-toggle:hover {
+      opacity: 0.9;
+    }
+
+    /* FIREBASE CONFIG MODAL */
+    .config-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .config-modal-backdrop.open {
+      display: flex;
+    }
+
+    .config-modal-card {
+      background: #0d172a;
+      border: 1px solid var(--border-focus);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .config-modal-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .config-modal-card p {
+      font-size: 0.85rem;
+      color: var(--text-body);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .config-modal-card textarea {
+      width: 100%;
+      height: 150px;
+      background: rgba(7, 12, 24, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: var(--cyan-light);
+      outline: none;
+      margin-bottom: 1.25rem;
+      resize: vertical;
+    }
+    .config-modal-card textarea:focus {
+      border-color: var(--cyan);
+    }
+
+    .modal-btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .btn-modal-cancel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-white);
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-modal-save {
+      background: var(--cyan);
+      color: #050d1a;
+      border: none;
+      padding: 0.55rem 1.35rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     /* CONTROLS */
@@ -431,11 +608,11 @@
       height: 260px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .brand-group .client-title {
         display: none;
       }
-      .controls-strip {
+      .controls-strip, .cloud-banner {
         flex-direction: column;
         align-items: flex-start;
       }
@@ -460,10 +637,17 @@
     </div>
 
     <div class="dash-header-actions">
+      <!-- Cloud Mode Badge -->
+      <div class="cloud-sync-badge" onclick="openConfigModal()" title="Click to view/configure Firebase Cloud Keys">
+        <span id="cloudModeIcon">☁️</span>
+        <span id="cloudModeLabel">Cloud Storage Ready</span>
+      </div>
+
       <div class="status-indicator">
         <span class="pulse-dot"></span>
-        <span>Telemetry Live</span>
+        <span id="streamStatusText">Live Feed</span>
       </div>
+      
       <button class="btn-logout" onclick="handleLogout()" title="End Session and Logout">
         <span>⏻</span> Logout
       </button>
@@ -472,6 +656,22 @@
 
   <!-- MAIN DASHBOARD -->
   <main class="dash-main">
+
+    <!-- CLOUD CONFIGURATION & PERSISTENCE BANNER -->
+    <div class="cloud-banner" id="cloudBanner">
+      <div class="cloud-banner-info">
+        <div class="cloud-icon-box" id="cloudBannerIcon">☁️</div>
+        <div class="cloud-banner-text">
+          <h4 id="cloudBannerTitle">Google Firebase Cloud Database Integration</h4>
+          <p id="cloudBannerSub">Sensor logs and cumulative totalizers are synchronized to Firestore in real-time.</p>
+        </div>
+      </div>
+      <div class="cloud-banner-actions">
+        <button class="btn-cloud-toggle" onclick="openConfigModal()">⚙️ Manage Cloud Keys</button>
+      </div>
+    </div>
+
+    <!-- Controls Strip -->
     <div class="controls-strip">
       <div class="controls-left">
         <button class="btn-zoom-reset" onclick="resetCurrentZoom()">⟲ Reset Zoom</button>
@@ -488,7 +688,7 @@
 
     <!-- FLOW PANE -->
     <div id="flow-pane" class="tab-pane active">
-      <p class="section-label">Flow Transmitters — Live Rate & Totalizer</p>
+      <p class="section-label">Flow Transmitters — Live Rate & Cumulative Totalizer</p>
       <div class="cards-grid" id="flow-cards"></div>
 
       <p class="section-label">Flow Rate Telemetry (L/min)</p>
@@ -526,6 +726,29 @@
     </div>
   </main>
 
+  <!-- FIREBASE CONFIG MODAL -->
+  <div class="config-modal-backdrop" id="configModal">
+    <div class="config-modal-card">
+      <h3><span>🔥</span> Firebase Cloud Configuration</h3>
+      <p>Paste your <code>firebaseConfig</code> object from your Firebase Console. It will be stored safely in your browser so your dashboard directly streams to Google Cloud.</p>
+      
+      <textarea id="configTextarea" placeholder='const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
+};'></textarea>
+
+      <div class="modal-btn-row">
+        <button class="btn-modal-cancel" onclick="closeConfigModal()">Cancel</button>
+        <button class="btn-modal-save" onclick="saveFirebaseConfig()">Connect to Firebase →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART & ZOOM SCRIPTS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
@@ -536,6 +759,115 @@
       window.location.replace('customer-login.html');
     }
 
+    // ── FIREBASE CLOUD MANAGEMENT ──
+    const CONFIG_STORAGE_KEY = 'cls_firebase_cfg_drl';
+    let isCloudConnected = false;
+    let firestoreDb = null;
+
+    // Live Firebase Project Config for Dr. Reddy's Portal
+    let defaultFirebaseConfig = {
+      apiKey: "AIzaSyAWIkl0LwVKUoGANJttX98vkhBeFWvAzUE",
+      authDomain: "cls-drl-portal.firebaseapp.com",
+      projectId: "cls-drl-portal",
+      storageBucket: "cls-drl-portal.firebasestorage.app",
+      messagingSenderId: "807702139353",
+      appId: "1:807702139353:web:2a716ef52a5285a6d749c8",
+      measurementId: "G-H24V1PC9ND"
+    };
+
+    function initFirebaseCloud() {
+      const savedConfigStr = localStorage.getItem(CONFIG_STORAGE_KEY);
+      let activeConfig = defaultFirebaseConfig;
+
+      if (savedConfigStr) {
+        try {
+          activeConfig = JSON.parse(savedConfigStr);
+        } catch (e) {
+          console.warn("Could not parse saved firebase config", e);
+        }
+      }
+
+      if (activeConfig.apiKey && activeConfig.projectId) {
+        try {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(activeConfig);
+          }
+          firestoreDb = firebase.firestore();
+          isCloudConnected = true;
+          
+          document.getElementById('cloudModeLabel').textContent = 'Cloud Active: ' + activeConfig.projectId;
+          document.getElementById('cloudBannerTitle').textContent = '✓ Connected to Cloud Firestore (' + activeConfig.projectId + ')';
+          document.getElementById('cloudBannerSub').textContent = 'Telemetry is permanently stored in Google Cloud and synced across all devices.';
+          document.getElementById('cloudBannerIcon').textContent = '⚡';
+
+          // Listen to Live Cloud Stream
+          listenToCloudTelemetry();
+          console.log("🔥 Firebase Cloud Connected successfully!");
+        } catch (err) {
+          console.error("Firebase init error:", err);
+          fallbackToLocalStream("Firebase error: " + err.message);
+        }
+      } else {
+        fallbackToLocalStream("Ready for Cloud Keys (Simulating Stream)");
+      }
+    }
+
+    function fallbackToLocalStream(msg) {
+      isCloudConnected = false;
+      document.getElementById('cloudModeLabel').textContent = 'Local Stream (Click to connect Cloud)';
+      document.getElementById('cloudBannerTitle').textContent = '⚡ Local Stream Active';
+      document.getElementById('cloudBannerSub').textContent = msg + ' — Click Manage Cloud Keys above to connect Google Firebase for permanent storage.';
+    }
+
+    function openConfigModal() {
+      const saved = localStorage.getItem(CONFIG_STORAGE_KEY) || JSON.stringify(defaultFirebaseConfig, null, 2);
+      document.getElementById('configTextarea').value = saved;
+      document.getElementById('configModal').classList.add('open');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.remove('open');
+    }
+
+    function saveFirebaseConfig() {
+      let rawText = document.getElementById('configTextarea').value.trim();
+      let extracted = null;
+
+      try {
+        // Try direct JSON
+        extracted = JSON.parse(rawText);
+      } catch (e) {
+        // Extract fields using Regex if full JS snippet was pasted
+        const apiKeyMatch = rawText.match(/apiKey\s*:\s*["']([^"']+)["']/);
+        const projectIdMatch = rawText.match(/projectId\s*:\s*["']([^"']+)["']/);
+        const authDomainMatch = rawText.match(/authDomain\s*:\s*["']([^"']+)["']/);
+        const storageBucketMatch = rawText.match(/storageBucket\s*:\s*["']([^"']+)["']/);
+        const messagingSenderIdMatch = rawText.match(/messagingSenderId\s*:\s*["']([^"']+)["']/);
+        const appIdMatch = rawText.match(/appId\s*:\s*["']([^"']+)["']/);
+
+        if (apiKeyMatch && projectIdMatch) {
+          extracted = {
+            apiKey: apiKeyMatch[1],
+            projectId: projectIdMatch[1],
+            authDomain: authDomainMatch ? authDomainMatch[1] : `${projectIdMatch[1]}.firebaseapp.com`,
+            storageBucket: storageBucketMatch ? storageBucketMatch[1] : `${projectIdMatch[1]}.firebasestorage.app`,
+            messagingSenderId: messagingSenderIdMatch ? messagingSenderIdMatch[1] : "",
+            appId: appIdMatch ? appIdMatch[1] : ""
+          };
+        }
+      }
+
+      if (extracted && extracted.apiKey && extracted.projectId) {
+        localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(extracted));
+        closeConfigModal();
+        alert("✓ Connected to Firebase Project: " + extracted.projectId + "!");
+        window.location.reload();
+      } else {
+        alert("⚠️ Could not detect valid Firebase keys. Please ensure apiKey and projectId are present.");
+      }
+    }
+
+    // ── DATA DEFINITIONS ──
     const FIRE_ZONES = [
       { id: 'FZ-01', name: 'Raw Material Warehouse', mac: 'FS:01' },
       { id: 'FZ-02', name: 'PeptiWave Cleanroom Suite', mac: 'FS:02' },
@@ -607,7 +939,56 @@
       if (tabId === 'flow') renderFlowChart();
     }
 
-    // 1. FLOW
+    // ── FIRESTORE LIVE LISTENER ──
+    function listenToCloudTelemetry() {
+      if (!firestoreDb) return;
+
+      firestoreDb.collection("drl_telemetry")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .onSnapshot((snapshot) => {
+          if (!snapshot.empty) {
+            const latestDoc = snapshot.docs[0].data();
+            applyCloudTelemetryData(latestDoc);
+          }
+        }, (err) => {
+          console.warn("Firestore listener error (check security rules):", err);
+        });
+    }
+
+    function applyCloudTelemetryData(docData) {
+      if (docData.flowData) {
+        docData.flowData.forEach((d, i) => {
+          if (FLOW_METERS[i]) FLOW_METERS[i].totalizer = d.totalizer;
+          flowHistory[i].push(d.flow);
+          if (flowHistory[i].length > 50) flowHistory[i].shift();
+        });
+        renderFlowCards(docData.flowData);
+        renderFlowChart();
+      }
+
+      if (docData.motorData) {
+        docData.motorData.forEach((d, i) => {
+          motorHistory[i].push(d.rpm);
+          if (motorHistory[i].length > 50) motorHistory[i].shift();
+        });
+        renderMotorCards(docData.motorData);
+        renderMotorChart();
+      }
+
+      if (docData.fireData) {
+        docData.fireData.forEach((d, i) => {
+          fireHistory[i].push(d.smokeLevel);
+          if (fireHistory[i].length > 50) fireHistory[i].shift();
+        });
+        renderFireCards(docData.fireData);
+        renderFireChart();
+      }
+
+      document.getElementById('last-update').textContent = 'Cloud Sync • ' + new Date().toLocaleTimeString();
+    }
+
+    // ── RENDERERS ──
     function renderFlowCards(data) {
       const wrap = document.getElementById('flow-cards');
       wrap.innerHTML = '';
@@ -681,7 +1062,6 @@
       }
     }
 
-    // 2. MOTOR
     function renderMotorCards(data) {
       const wrap = document.getElementById('motor-cards');
       wrap.innerHTML = '';
@@ -760,7 +1140,6 @@
       }
     }
 
-    // 3. FIRE
     function renderFireCards(data) {
       const wrap = document.getElementById('fire-cards');
       wrap.innerHTML = '';
@@ -837,11 +1216,9 @@
       }
     }
 
-    // LOOP
-    function simulateFetch() {
-      document.getElementById('last-update').textContent = 'Live • ' + new Date().toLocaleTimeString();
-
-      // Fire
+    // ── TELEMETRY GENERATOR & CLOUD PUSHER ──
+    function fetchOrSimulateTelemetry() {
+      // 1. Generate new state
       const fireData = FIRE_ZONES.map((z, i) => {
         const lastSmoke = fireHistory[i].length ? fireHistory[i][fireHistory[i].length - 1] : 2;
         let smoke = Math.max(0, Math.min(100, lastSmoke + (Math.random() - 0.45) * 2.5));
@@ -853,14 +1230,7 @@
           valveOpen: smoke > 15
         };
       });
-      fireData.forEach((d, i) => {
-        fireHistory[i].push(d.smokeLevel);
-        if (fireHistory[i].length > 50) fireHistory[i].shift();
-      });
-      renderFireCards(fireData);
-      renderFireChart();
 
-      // Motors
       const motorData = MOTORS.map((m, i) => {
         const lastRpm = motorHistory[i].length ? motorHistory[i][motorHistory[i].length - 1] : 1450;
         const rpm = Math.max(0, Math.min(1800, lastRpm + (Math.random() - 0.45) * 45));
@@ -871,14 +1241,7 @@
           vibration: 1.2 + (rpm / 1800) * 2 + Math.random() * 0.4
         };
       });
-      motorData.forEach((d, i) => {
-        motorHistory[i].push(d.rpm);
-        if (motorHistory[i].length > 50) motorHistory[i].shift();
-      });
-      renderMotorCards(motorData);
-      renderMotorChart();
 
-      // Flow
       const flowData = FLOW_METERS.map((fm, i) => {
         const lastFlow = flowHistory[i].length ? flowHistory[i][flowHistory[i].length - 1] : 45;
         const flow = Math.max(0, Math.min(120, lastFlow + (Math.random() - 0.45) * 10));
@@ -886,16 +1249,26 @@
         fm.totalizer += addedVolume;
         return { ...fm, flow: flow };
       });
-      flowData.forEach((d, i) => {
-        flowHistory[i].push(d.flow);
-        if (flowHistory[i].length > 50) flowHistory[i].shift();
-      });
-      renderFlowCards(flowData);
-      renderFlowChart();
+
+      // 2. If Cloud connected, push record to Firestore
+      if (isCloudConnected && firestoreDb) {
+        firestoreDb.collection("drl_telemetry").add({
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          client: "Dr. Reddy's Laboratories",
+          flowData: flowData,
+          motorData: motorData,
+          fireData: fireData
+        }).catch(e => console.warn("Firestore write error:", e));
+      } else {
+        // Fallback local display
+        applyCloudTelemetryData({ flowData, motorData, fireData });
+      }
     }
 
-    simulateFetch();
-    setInterval(simulateFetch, INTERVAL_MS);
+    // ── INITIALIZATION ──
+    initFirebaseCloud();
+    fetchOrSimulateTelemetry();
+    setInterval(fetchOrSimulateTelemetry, INTERVAL_MS);
   </script>
 
 </body>
